@@ -1,6 +1,7 @@
 // src/components/Contact/index.tsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { designTokens, applyDesignTokens } from "@/utils/designTokens";
+import { overlayMap } from "@/utils/overlayMap";
 
 type Props = {
   address?: string;
@@ -10,18 +11,44 @@ type Props = {
   onSubmit?: (data: { name: string; email: string; website: string; message: string }) => void;
 };
 
-const Contact: React.FC<Props> = ({
-  address = "66 West Flagler St, Miami, Florida, 33130",
-  phones = ["125-711-811", "125-668-886"],
-  supportEmail = "Support.photography@gmail.com",
-  mapSrc = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3586.547649012345!2d-80.1950148236409!3d25.774265911945164!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x88d9b69f4d0d69cf%3A0x28a55d3ad739888!2s66%20W%20Flagler%20St%2C%20Miami%2C%20FL%2033130!5e0!3m2!1sen!2sus!4v1691777777777!5m2!1sen!2sus",
-  onSubmit,
-}) => {
+const Contact: React.FC<Props> = (props) => {
+  // ---- overlayMap integration (use /contact → contact node) ----
+  const overlay = overlayMap?.["/contact"]?.contact;
+
+  // Merge overlay props (if any) with incoming props; incoming wins
+  const {
+    address,
+    phones,
+    supportEmail,
+    mapSrc,
+    onSubmit,
+  } = {
+    address: props.address ?? overlay?.props?.address ?? "66 West Flagler St, Miami, Florida, 33130",
+    phones: props.phones ?? overlay?.props?.phones ?? ["125-711-811", "125-668-886"],
+    supportEmail: props.supportEmail ?? overlay?.props?.supportEmail ?? "Support.photography@gmail.com",
+    mapSrc:
+      props.mapSrc ??
+      overlay?.props?.mapSrc ??
+      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3586.547649012345!2d-80.1950148236409!3d25.774265911945164!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x88d9b69f4d0d69cf%3A0x28a55d3ad739888!2s66%20W%20Flagler%20St%2C%20Miami%2C%20FL%2033130!5e0!3m2!1sen!2sus!4v1691777777777!5m2!1sen!2sus",
+    onSubmit: props.onSubmit,
+  };
+
   const [form, setForm] = useState({ name: "", email: "", website: "", message: "" });
 
+  // Only apply the tokens that this overlay cares about (values from designTokens)
+  const tokensForContact = useMemo(() => {
+    const keys = overlay?.tokens ?? [];
+    const subset: Record<string, string> = {};
+    keys.forEach((k: string) => {
+      if (k in designTokens) subset[k] = (designTokens as any)[k];
+    });
+    // If overlay is missing (e.g., during dev), just fall back to all tokens
+    return Object.keys(subset).length ? subset : designTokens;
+  }, [overlay]);
+
   useEffect(() => {
-    applyDesignTokens(designTokens);
-  }, []);
+    applyDesignTokens(tokensForContact);
+  }, [tokensForContact]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -35,6 +62,7 @@ const Contact: React.FC<Props> = ({
 
   return (
     <section
+      id={overlay?.id ?? "component-contact"}
       className="contact spad"
       style={{
         background: "var(--contact-section-bg-contact-1)",
@@ -43,7 +71,8 @@ const Contact: React.FC<Props> = ({
       }}
     >
       <div className="container">
-        <div className="row" style={{ gap: "var(--contact-section-gap-contact-1)" }}>
+        {/* 🔥 Removed the custom gap that conflicted with Bootstrap rows */}
+        <div className="row">
           {/* Left: Info + Form */}
           <div className="col-lg-6 col-md-6">
             <div className="contact__content">
@@ -256,7 +285,8 @@ const Contact: React.FC<Props> = ({
                       fontWeight: "var(--contact-button-font-weight-contact-1)",
                       color: "var(--contact-button-text-color-contact-1)",
                       background: "var(--contact-button-bg-contact-1)",
-                      padding: "var(--contact-button-padding-y-contact-1) var(--contact-button-padding-x-contact-1)",
+                      padding:
+                        "var(--contact-button-padding-y-contact-1) var(--contact-button-padding-x-contact-1)",
                       borderRadius: "var(--contact-button-border-radius-contact-1)",
                     }}
                   >
