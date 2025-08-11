@@ -8,9 +8,11 @@ import Footer from '../components/common/Footer';
 import Preloader from '../components/common/Preloader';
 import OffcanvasMenu from '../components/common/OffcanvasMenu';
 import Breadcrumb from '../components/common/Breadcrumb';
-import Social from '../components/common/Social';
 
-const Home = () => {
+// Local components
+import ContactSection from '../components/Contact';
+
+const Contact = () => {
 
 
 
@@ -20,7 +22,8 @@ const Home = () => {
       <Preloader />
       <OffcanvasMenu />
       <Breadcrumb />
-      <Social />
+      <ContactSection />
+
 
     
 
@@ -30,4 +33,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Contact;

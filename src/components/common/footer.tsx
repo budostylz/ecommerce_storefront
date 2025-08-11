@@ -12,7 +12,19 @@ const Footer: React.FC = () => {
           <div className="col-lg-4 col-md-6 col-sm-7">
             <div className="footer__about">
               <div className="footer__logo">
-                <a href="/"><img src="/origin/base/web/img/logo.png" alt="Logo" /></a>
+                <a href="/">
+               <img
+                src="https://storage.googleapis.com/budoapps-5aacf.firebasestorage.app/templates/ecommerce/fashio/logo.png"
+                alt="Logo"
+                style={{
+                    maxWidth: "150px",
+                    height: "auto",
+                    display: "block",
+                    marginBottom: "15px"
+                }}
+                />
+
+                </a>
               </div>
               <p>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt cilisis.
@@ -75,13 +87,16 @@ const Footer: React.FC = () => {
         {/* Copyright */}
         <div className="row">
           <div className="col-lg-12">
-            <div className="footer__copyright__text">
-              <p>
-                Copyright &copy; {currentYear} All rights reserved | 
-                This template is made with <i className="fa fa-heart" aria-hidden="true"></i> 
-                by <a href="https://colorlib.com" target="_blank" rel="noopener noreferrer">Colorlib</a>
-              </p>
-            </div>
+         <div className="footer__copyright__text">
+                <p>
+                    © {currentYear} Crafted with passion <i className="fa fa-heart" aria-hidden="true"></i> on&nbsp;
+                    <a href="https://budoboost.com" target="_blank" rel="noopener noreferrer">
+                    BudoBoost
+                    </a>
+                    &nbsp;— Empowering creators to launch beautiful sites in minutes.
+                </p>
+        </div>
+
           </div>
         </div>
       </div>

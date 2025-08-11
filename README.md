@@ -28,3 +28,37 @@ export default {
 - Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
 - Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
 - Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+
+## Recommended structure (Firestore)
+/users/{uid}
+/projects/{projectId}
+/projects/{projectId}/pages/{pageId}
+/projects/{projectId}/components/{componentId}
+/projects/{projectId}/designTokens/{tokenSetId}
+/projects/{projectId}/overlayMap/{overlayId}
+/projects/{projectId}/versions/{versionId}
+/projects/{projectId}/deployments/{deploymentId}
+
+/templates/{templateId}
+/templates/{templateId}/pages/{pageId}
+/templates/{templateId}/designTokens/{tokenSetId}
+/templates/{templateId}/overlayMap/{overlayId}
+
+// /projects/{projectId}/pages/{pageId}
+{
+  projectId,           // stable
+  uid,                 // owner
+  templateId,          // which template
+  pageType,            // 'home' | 'shop' | 'product' | ...
+  updatedAt,
+  // template-specific fields live here:
+  custom: { ... },     // freeform per template/schema version
+  schema: {            // reference to schema
+    templateId,
+    version: 'v1.3.0'
+  }
+}
+
+
+## Assets
+https://storage.googleapis.com/budoapps-5aacf.firebasestorage.app/templates/ecommerce/fashio/logo.png
