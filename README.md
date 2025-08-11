@@ -1,33 +1,5 @@
-# React + TypeScript + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
-
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+## Template
+[Template](https://colorlib.com/wp/template/ashion/)
 
 ## Recommended structure (Firestore)
 /users/{uid}
@@ -62,3 +34,90 @@ export default {
 
 ## Assets
 https://storage.googleapis.com/budoapps-5aacf.firebasestorage.app/templates/ecommerce/fashio/logo.png
+
+
+1. Fashion E-commerce (already in progress)
+
+Focus: Apparel, accessories, and lifestyle brands.
+
+Key features: Product grid, category filtering, Instagram/social integration, lookbook.
+
+2. Restaurant / Food Ordering
+
+Focus: Restaurants, cafes, catering services.
+
+Key features: Menu showcase, online ordering, reservations, Google Maps, gallery.
+
+3. Portfolio / Creative Agency
+
+Focus: Designers, photographers, artists, agencies.
+
+Key features: Masonry gallery, project detail pages, service listings, contact form.
+
+4. Corporate / SaaS Landing Page
+
+Focus: Tech companies, startups, professional services.
+
+Key features: Hero with call-to-action, feature grid, testimonials, pricing plans.
+
+5. Fitness / Wellness Studio
+
+Focus: Gyms, yoga studios, personal trainers.
+
+Key features: Class schedule, trainer profiles, membership pricing, booking form.
+
+6. Event / Conference
+
+Focus: Events, conferences, workshops.
+
+Key features: Agenda, speaker bios, ticket sales, location map.
+
+7. Blog / Content Publication
+
+Focus: News sites, personal blogs, niche content hubs.
+
+Key features: Category archives, single post templates, social share integration.
+
+
+Template picks (Colorlib → BudoBoost)
+Fashion E-commerce – Ashion (you’re on it)
+
+Pages: Home, Shop, Product, Cart, Checkout, Contact
+
+Reuse: Header, Footer, ProductCard, ProductGrid, Filters, Breadcrumb
+
+Restaurant / Food Ordering – Foodee (or Restaurantly)
+
+Features: Menu sections, chef/team, gallery, reservation form, map
+
+JS swaps: Lightbox → react-image-lightbox, carousel → Keen Slider
+
+Portfolio / Creative Agency – Mona (or Karma)
+
+Features: Masonry/Isotope grid, project details, services, CTA blocks
+
+Reuse: CardGrid, Testimonial, Pricing, ContactForm
+
+Corporate / SaaS Landing – SaaS (or Startup)
+
+Features: Hero w/ CTA, feature grid, integrations, pricing, FAQ
+
+Reuse: PricingTable, FeatureList, Newsletter, Stats
+
+Fitness / Wellness Studio – Gym (or Yogalife)
+
+Features: Class schedule, trainers, membership pricing, timetable
+
+JS swaps: Timetable → simple state filters, carousel → Keen Slider
+
+Event / Conference – Evento (or Conference)
+
+Features: Agenda/schedule, speakers, tickets/pricing, venue map
+
+Reuse: ScheduleList, SpeakerCard, TicketPricing, Countdown (→ react-countdown)
+
+Blog / Publication – News (or Miniblog)
+
+Features: Category list, article grid, single post, sidebar widgets
+
+Note: Even if we de-emphasize blog, this doubles as a content marketing template
