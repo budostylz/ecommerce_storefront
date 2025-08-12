@@ -264,5 +264,7 @@ Store APIs: updateComponentProps, updateDesignToken, setEditingTarget, getCompon
 
 Exit Edit Mode: Global click listener + ESC handler + setEditingTarget(null)
 
-## Raven Site
-Raven Site[](https://colorlib.com/wp/template/homes/)
+## Customer Templates
+[Raven Site](https://colorlib.com/wp/template/homes/)
+
+[Lucy Site](https://colorlib.com/wp/template/opium/)

@@ -1,6 +1,94 @@
 // e.g. src/utils/overlayMap.ts (excerpt)
 export const overlayMap = {
-  '/contact': {
+  global: {
+    "footer": {
+      component: "footer",
+      props: {
+        aboutText:
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt cilisis.",
+        quickLinks: ["About", "Blogs", "Contact", "FAQ"],
+        accountLinks: ["My Account", "Orders Tracking", "Checkout", "Wishlist"],
+        newsletterTitle: "NEWSLETTER",
+        newsletterPlaceholder: "Email",
+        newsletterButton: "Subscribe",
+        socialLinks: [
+          { icon: "fa fa-facebook", href: "#" },
+          { icon: "fa fa-twitter", href: "#" },
+          { icon: "fa fa-youtube-play", href: "#" },
+          { icon: "fa fa-instagram", href: "#" },
+          { icon: "fa fa-pinterest", href: "#" }
+        ],
+        copyrightText: `© ${new Date().getFullYear()} Crafted with passion <i class="fa fa-heart" aria-hidden="true"></i> on <a href="https://budoboost.com" target="_blank" rel="noopener noreferrer">BudoBoost</a> — Empowering creators to launch beautiful sites in minutes.`
+      },
+      tokens: [
+        "--footer-section-bg-global-0",
+        "--footer-section-padding-top-global-0",
+        "--footer-section-padding-bottom-global-0",
+
+        "--footer-logo-max-width-global-0",
+        "--footer-logo-margin-bottom-global-0",
+
+        "--footer-about-text-font-size-global-0",
+        "--footer-about-text-color-global-0",
+        "--footer-about-text-margin-bottom-global-0",
+
+        "--footer-payment-icon-gap-global-0",
+        "--footer-payment-icon-margin-bottom-global-0",
+
+        "--footer-widget-title-font-size-global-0",
+        "--footer-widget-title-color-global-0",
+        "--footer-widget-title-font-weight-global-0",
+        "--footer-widget-title-text-transform-global-0",
+        "--footer-widget-title-margin-bottom-global-0",
+
+        "--footer-link-font-size-global-0",
+        "--footer-link-color-global-0",
+        "--footer-link-line-height-global-0",
+        "--footer-link-hover-color-global-0",
+
+        "--footer-newsletter-title-font-size-global-0",
+        "--footer-newsletter-title-color-global-0",
+        "--footer-newsletter-title-font-weight-global-0",
+        "--footer-newsletter-title-text-transform-global-0",
+        "--footer-newsletter-title-margin-bottom-global-0",
+
+        "--footer-newsletter-input-height-global-0",
+        "--footer-newsletter-input-border-color-global-0",
+        "--footer-newsletter-input-border-radius-global-0",
+        "--footer-newsletter-input-font-size-global-0",
+        "--footer-newsletter-input-text-color-global-0",
+        "--footer-newsletter-input-bg-global-0",
+        "--footer-newsletter-input-padding-x-global-0",
+        "--footer-newsletter-input-placeholder-color-global-0",
+
+        "--footer-button-font-size-global-0",
+        "--footer-button-text-color-global-0",
+        "--footer-button-bg-global-0",
+        "--footer-button-font-weight-global-0",
+        "--footer-button-text-transform-global-0",
+        "--footer-button-padding-y-global-0",
+        "--footer-button-padding-x-global-0",
+        "--footer-button-border-radius-global-0",
+
+        "--footer-social-size-global-0",
+        "--footer-social-bg-global-0",
+        "--footer-social-icon-font-size-global-0",
+        "--footer-social-icon-color-global-0",
+        "--footer-social-gap-global-0",
+
+        "--footer-copyright-border-color-global-0",
+        "--footer-copyright-padding-top-global-0",
+        "--footer-copyright-padding-bottom-global-0",
+        "--footer-copyright-text-align-global-0",
+        "--footer-copyright-margin-top-global-0",
+        "--footer-copyright-text-color-global-0",
+        "--footer-copyright-link-color-global-0",
+        "--footer-copyright-link-hover-color-global-0",
+        "--footer-copyright-heart-color-global-0"
+      ]
+    }
+  },
+'/contact': {
     contact: {
       id: 'component-contact',
       component: 'Contact',
