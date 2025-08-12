@@ -13,7 +13,11 @@ const Contact: React.FC<ContactProps> = (props) => {
   // Zustand state
   const overlayState = usePreviewStore((s) => s.overlayMap);
   const tokensBag = usePreviewStore((s) => s.designTokens);
+
+  const updateComponentProps = usePreviewStore((s) => s.updateComponentProps);
   const updateDesignToken = usePreviewStore((s) => s.updateDesignToken);
+
+
 
   const editingTarget = usePreviewStore((s) => s.editingTarget);
   const setEditingTarget = usePreviewStore((s) => s.setEditingTarget);
@@ -55,6 +59,7 @@ const Contact: React.FC<ContactProps> = (props) => {
     supportEmail,
     mapSrc,
     onSubmit,
+    isDesignMode, 
   } = {
     address: props.address ?? overlay?.props?.address ?? "66 West Flagler St, Miami, Florida, 33130",
     phones: props.phones ?? overlay?.props?.phones ?? ["125-711-811", "125-668-886"],
@@ -64,10 +69,12 @@ const Contact: React.FC<ContactProps> = (props) => {
       overlay?.props?.mapSrc ??
       "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3586.547649012345!2d-80.1950148236409!3d25.774265911945164!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x88d9b69f4d0d69cf%3A0x28a55d3ad739888!2s66%20W%20Flagler%20St%2C%20Miami%2C%20FL%2033130!5e0!3m2!1sen!2sus!4v1691777777777!5m2!1sen!2sus",
     onSubmit: props.onSubmit,
+    isDesignMode: props.isDesignMode ?? true,
   };
 
   const [form, setForm] = useState({ name: "", email: "", website: "", message: "" });
 
+  console.log('isDesignMode: ', isDesignMode);
 
   // Only apply the tokens that this overlay cares about (values from designTokens)
   const tokensForContact = useMemo(() => {
@@ -143,6 +150,28 @@ const Contact: React.FC<ContactProps> = (props) => {
   }
 }, [editingTarget]);
 
+useEffect(() => {
+  if (!isDesignMode || !editingTarget) return;
+  if (editingTarget.componentKey !== "contact") return;
+
+  const field = editingTarget.field; // e.g., "contactInfo", "address", "phones"
+  const page = "/contact"; // Contact lives under overlayMap["/contact"]
+
+  const prefix = `--contact-${field}-`;
+  const suffix = `contact-1`; // Matches your overlayMap token naming scheme
+
+  const filteredKeys = (overlayMap[page]?.contact?.tokens || []).filter(
+    (key: string) => key.startsWith(prefix) && key.endsWith(suffix)
+  );
+
+  filteredKeys.forEach((key: string) => {
+    const value = designTokens[key];
+    if (value !== undefined) {
+      document.documentElement.style.setProperty(key, value);
+    }
+  });
+}, [designTokens, editingTarget, isDesignMode]);
+
 
   useEffect(() => {
     applyDesignTokens(tokensForContact);
@@ -157,6 +186,128 @@ const Contact: React.FC<ContactProps> = (props) => {
     onSubmit?.(form);
     setForm({ name: "", email: "", website: "", message: "" });
   };
+
+const CONTACT_SUFFIX = "contact-1";
+
+const handleStyleChange = (updates: StyleUpdates) => {
+  if (!editingTarget || editingTarget.componentKey !== "contact") return;
+
+  const { field } = editingTarget;
+
+  console.log('Checking Field: ', field);
+
+  // Helpers
+  const setToken = (token: string, val: string) => {
+    updateDesignToken(token, normalizeValue(token, val));
+  };
+
+  const mapCommon = (prefix: string) => {
+    // Common text props for headings/labels
+    if (updates.fontFamily) setToken(`--${prefix}-font-family-${CONTACT_SUFFIX}`, updates.fontFamily);
+    if (updates.fontSize)   setToken(`--${prefix}-font-size-${CONTACT_SUFFIX}`, updates.fontSize);
+    if (updates.fontWeight) setToken(`--${prefix}-font-weight-${CONTACT_SUFFIX}`, String(updates.fontWeight));
+    if (updates.textTransform) setToken(`--${prefix}-text-transform-${CONTACT_SUFFIX}`, updates.textTransform);
+    if (updates.textAlign)  setToken(`--${prefix}-text-align-${CONTACT_SUFFIX}`, updates.textAlign);
+    if (updates.lineHeight) setToken(`--${prefix}-line-height-${CONTACT_SUFFIX}`, String(updates.lineHeight));
+    if (updates.textColor)  setToken(`--${prefix}-color-${CONTACT_SUFFIX}`, updates.textColor);
+  };
+
+  switch (field) {
+    /** Left column heading: "Contact info" */
+    case "contactInfo": {
+      mapCommon("contact-heading");
+      break;
+    }
+
+    /** Form title: "SEND MESSAGE" */
+    case "sendMessageLabel": {
+      mapCommon("contact-form-heading");
+      break;
+    }
+
+    /** Button: "Send Message" — special token mapping */
+    case "sendMessageButton": {
+      if (updates.fontSize)      setToken(`--contact-button-font-size-${CONTACT_SUFFIX}`, updates.fontSize);
+      if (updates.textTransform) setToken(`--contact-button-text-transform-${CONTACT_SUFFIX}`, updates.textTransform);
+      if (updates.fontWeight)    setToken(`--contact-button-font-weight-${CONTACT_SUFFIX}`, String(updates.fontWeight));
+      if (updates.textColor)     setToken(`--contact-button-text-color-${CONTACT_SUFFIX}`, updates.textColor);
+      if (updates.backgroundColor) setToken(`--contact-button-bg-${CONTACT_SUFFIX}`, updates.backgroundColor);
+      if (updates.borderRadius)  setToken(`--contact-button-border-radius-${CONTACT_SUFFIX}`, updates.borderRadius);
+
+      // padding -> split into Y / X
+      if (updates.padding) {
+        // Accept "12px 30px" or "12px 30px 12px 30px"
+        const parts = updates.padding.trim().split(/\s+/);
+        // CSS rules: 1->all, 2->Y/X, 3->T/X/B, 4->T/R/B/L; we only care Y & X
+        let py = parts[0];
+        let px = parts[0];
+        if (parts.length === 2) {
+          py = parts[0];
+          px = parts[1];
+        } else if (parts.length === 3) {
+          py = parts[0];
+          px = parts[1];
+        } else if (parts.length >= 4) {
+          py = parts[0]; // top
+          px = parts[1]; // right
+        }
+        setToken(`--contact-button-padding-y-${CONTACT_SUFFIX}`, py);
+        setToken(`--contact-button-padding-x-${CONTACT_SUFFIX}`, px);
+      }
+      break;
+    }
+
+    /** Address / Phones / Support email — share the same "info text" token family */
+    case "address":
+    case "phones":
+    case "supportEmail": {
+      if (updates.fontSize)  setToken(`--contact-info-text-font-size-${CONTACT_SUFFIX}`, updates.fontSize);
+      if (updates.textColor) setToken(`--contact-info-text-color-${CONTACT_SUFFIX}`, updates.textColor);
+      // (Optional) allow icon/spacing tweaks if your inspector ever exposes them:
+      // if (updates.iconSize) setToken(`--contact-info-icon-size-${CONTACT_SUFFIX}`, updates.iconSize);
+      // if (updates.gap) setToken(`--contact-info-item-gap-${CONTACT_SUFFIX}`, updates.gap);
+      break;
+    }
+
+    /** Optional: labels like "Address", "Phone", "Support" map to the "title" token family */
+    case "addressLabel":
+    case "phoneLabel":
+    case "supportLabel": {
+      if (updates.fontSize)   setToken(`--contact-info-title-font-size-${CONTACT_SUFFIX}`, updates.fontSize);
+      if (updates.fontWeight) setToken(`--contact-info-title-font-weight-${CONTACT_SUFFIX}`, String(updates.fontWeight));
+      if (updates.textColor)  setToken(`--contact-info-title-color-${CONTACT_SUFFIX}`, updates.textColor);
+      break;
+    }
+
+    default:
+      // No-op for fields that are content-only (e.g., placeholders) or not style-driven
+      break;
+  }
+};
+
+const getToken = (key: string, index?: number) => {
+  const suffix = index !== undefined ? `contact-${index}` : "contact-1";
+  return `--contact-${key}-${suffix}`;
+};
+
+
+const allowedFields = [
+  "contactInfo",
+  "sendMessageLabel",
+  "sendMessageButton",
+  "address",
+  "phones",
+  "supportEmail",
+  "namePlaceholder",
+  "emailPlaceholder",
+  "websitePlaceholder",
+  "messagePlaceholder"
+];
+
+const showInspector =
+  isDesignMode &&
+  editingTarget?.componentKey === "contact" &&
+  allowedFields.includes(editingTarget.field);
 
   return (
     <section
@@ -175,18 +326,62 @@ const Contact: React.FC<ContactProps> = (props) => {
           <div className="col-lg-6 col-md-6">
             <div className="contact__content">
               <div className="contact__address">
-                <h5
-                  style={{
-                    fontFamily: "var(--contact-heading-font-family-contact-1)",
-                    fontSize: "var(--contact-heading-font-size-contact-1)",
-                    fontWeight: "var(--contact-heading-font-weight-contact-1)",
-                    textTransform: "var(--contact-heading-text-transform-contact-1)",
-                    color: "var(--contact-heading-color-contact-1)",
-                    marginBottom: "var(--contact-heading-margin-bottom-contact-1)",
-                  }}
-                >
-                  Contact info
-                </h5>
+               {/* Contact Info heading (editable) */}
+                  {isDesignMode &&
+                  editingTarget?.componentKey === "contact" &&
+                  editingTarget.field === "contactInfo" ? (
+                    <textarea
+                      ref={contactInfoRef}
+                      value={overlay?.props?.contactInfo ?? "Contact info"}
+                       onChange={(e) => {
+                          updateComponentProps("/contact", "contact", {
+                            contactInfo: e.target.value,
+                          });
+                        }}
+                      onClick={(e) => {
+                        setClickedInsideInspector();
+                        e.stopPropagation();
+                      }}
+                      style={{
+                        width: "100%",
+                        fontFamily: "var(--contact-heading-font-family-contact-1)",
+                        fontSize: "var(--contact-heading-font-size-contact-1)",
+                        fontWeight: "var(--contact-heading-font-weight-contact-1)",
+                        textTransform: "var(--contact-heading-text-transform-contact-1)",
+                        color: "var(--contact-heading-color-contact-1)",
+                        marginBottom: "var(--contact-heading-margin-bottom-contact-1)",
+                        background: "transparent",
+                        border: "none",
+                        outline: "none",
+                        resize: "none",
+                        whiteSpace: "pre-wrap",
+                      }}
+                    />
+                  ) : (
+                    <h5
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (isDesignMode) {
+                          setEditingTarget({
+                            route: "/contact",
+                            componentKey: "contact",
+                            field: "contactInfo",
+                          });
+                        }
+                      }}
+                      style={{
+                        fontFamily: "var(--contact-heading-font-family-contact-1)",
+                        fontSize: "var(--contact-heading-font-size-contact-1)",
+                        fontWeight: "var(--contact-heading-font-weight-contact-1)",
+                        textTransform: "var(--contact-heading-text-transform-contact-1)",
+                        color: "var(--contact-heading-color-contact-1)",
+                        marginBottom: "var(--contact-heading-margin-bottom-contact-1)",
+                      }}
+                    >
+                      {overlay?.props?.contactInfo ?? "Contact info"}
+                    </h5>
+                  )}
+
                 <ul style={{ marginBottom: "var(--contact-info-item-gap-contact-1)" }}>
                   <li style={{ marginBottom: "var(--contact-info-item-gap-contact-1)" }}>
                     <h6

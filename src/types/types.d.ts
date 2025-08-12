@@ -18,6 +18,19 @@ type EditingTarget = {
   index?: number;
 };
 
+type StyleUpdates = Partial<{
+  textColor: string;
+  fontFamily: string;
+  fontSize: string;
+  fontWeight: string | number;
+  lineHeight: string | number;
+  textAlign: string;
+  textTransform: string;
+  backgroundColor: string;
+  padding: string;        // e.g. "12px 30px" or "12px 30px 12px 30px"
+  borderRadius: string;
+}>;
+
 type ContactProps = {
   address?: string;
   phones?: string[];
