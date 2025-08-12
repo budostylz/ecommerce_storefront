@@ -11,8 +11,14 @@ export const overlayMap = {
         zIndex: 1
       },
       props: {
+        contactInfo:'Contact info',
+        sendMessageLabel:'SEND MESSAGE LABEL',
+        sendMessageButton:'Send Message Button',
+        addressLabel: 'Address',
         address: '66 West Flagler St, Miami, Florida, 33130',
+        phoneLabel:'Phone',
         phones: ['125-711-811', '125-668-886'],
+        supportLabel:'Support',
         supportEmail: 'Support.photography@gmail.com',
         mapSrc:
           'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3586.547649012345!2d-80.1950148236409!3d25.774265911945164!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x88d9b69f4d0d69cf%3A0x28a55d3ad739888!2s66%20W%20Flagler%20St%2C%20Miami%2C%20FL%2033130!5e0!3m2!1sen!2sus!4v1691777777777!5m2!1sen!2sus'

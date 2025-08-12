@@ -1,19 +1,52 @@
 // src/components/Contact/index.tsx
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useRef, useMemo, useState } from "react";
+import { usePreviewStore } from "src/store/previewStore";
 import { designTokens, applyDesignTokens } from "@/utils/designTokens";
 import { overlayMap } from "@/utils/overlayMap";
+import toast from "react-hot-toast";
+import { setClickedInsideInspector } from "src/utils/inspectorClickGuard";
+import { normalizeValue } from "src/utils/normalizeValue";
+import FloatingStyleInspector from "@components/FloatingStyleInspector";
 
-type Props = {
-  address?: string;
-  phones?: string[];
-  supportEmail?: string;
-  mapSrc?: string;
-  onSubmit?: (data: { name: string; email: string; website: string; message: string }) => void;
-};
 
-const Contact: React.FC<Props> = (props) => {
-  // ---- overlayMap integration (use /contact → contact node) ----
-  const overlay = overlayMap?.["/contact"]?.contact;
+const Contact: React.FC<ContactProps> = (props) => {
+  // Zustand state
+  const overlayState = usePreviewStore((s) => s.overlayMap);
+  const tokensBag = usePreviewStore((s) => s.designTokens);
+  const updateDesignToken = usePreviewStore((s) => s.updateDesignToken);
+
+  const editingTarget = usePreviewStore((s) => s.editingTarget);
+  const setEditingTarget = usePreviewStore((s) => s.setEditingTarget);
+
+  // This component’s overlay node
+  const overlay = overlayState?.["/contact"]?.contact;
+
+  console.log('overlayState: ', overlayState);
+  console.log('tokensBag: ', tokensBag);
+  console.log('updateDesignToken: ', updateDesignToken);
+  console.log('editingTarget: ', editingTarget);
+  console.log('setEditingTarget: ', setEditingTarget);
+  console.log('overlay: ', overlay);
+
+  // Refs for editable text fields
+  const contactInfoRef = useRef<HTMLTextAreaElement | null>(null);       // "Contact info" heading
+  const sendMessageLabelRef = useRef<HTMLTextAreaElement | null>(null);  // "SEND MESSAGE" label
+  const sendMessageButtonRef = useRef<HTMLTextAreaElement | null>(null); // "Send Message" button text
+  const addressRef = useRef<HTMLTextAreaElement | null>(null);           // Address text
+  const phonesRef = useRef<Array<HTMLTextAreaElement | null>>([]);       // Phone numbers (array)
+  const supportEmailRef = useRef<HTMLTextAreaElement | null>(null);      // Support email text
+
+  // Form field placeholders (optional)
+  const namePlaceholderRef = useRef<HTMLInputElement | null>(null);     // Name input placeholder
+  const emailPlaceholderRef = useRef<HTMLInputElement | null>(null);    // Email input placeholder
+  const websitePlaceholderRef = useRef<HTMLInputElement | null>(null);  // Website input placeholder
+  const messagePlaceholderRef = useRef<HTMLTextAreaElement | null>(null); // Message textarea placeholder
+
+  // Device detection
+  const [isMobileOrTablet, setIsMobileOrTablet] = useState(false);
+
+
+
 
   // Merge overlay props (if any) with incoming props; incoming wins
   const {
@@ -35,16 +68,81 @@ const Contact: React.FC<Props> = (props) => {
 
   const [form, setForm] = useState({ name: "", email: "", website: "", message: "" });
 
+
   // Only apply the tokens that this overlay cares about (values from designTokens)
   const tokensForContact = useMemo(() => {
     const keys = overlay?.tokens ?? [];
+    console.log('keys: ', keys);
     const subset: Record<string, string> = {};
+     console.log('subset: ', subset);
     keys.forEach((k: string) => {
       if (k in designTokens) subset[k] = (designTokens as any)[k];
     });
     // If overlay is missing (e.g., during dev), just fall back to all tokens
     return Object.keys(subset).length ? subset : designTokens;
   }, [overlay]);
+
+    useEffect(() => {
+    const checkDevice = () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const isTablet = w <= 1024 && w > 640;
+      const isMobile = w <= 640;
+      const isLandscape = w > h;
+      setIsMobileOrTablet(isMobile || isTablet || isLandscape);
+    };
+    checkDevice();
+    window.addEventListener("resize", checkDevice);
+    window.addEventListener("orientationchange", checkDevice);
+    return () => {
+      window.removeEventListener("resize", checkDevice);
+      window.removeEventListener("orientationchange", checkDevice);
+    };
+  }, []);
+
+  useEffect(() => {
+
+  console.log('editingTarget CHECK: ', editingTarget);
+  if (editingTarget?.componentKey === "contact") {
+    switch (editingTarget.field) {
+      case "contactInfo":
+        contactInfoRef.current?.focus();
+        break;
+      case "sendMessageLabel":
+        sendMessageLabelRef.current?.focus();
+        break;
+      case "sendMessageButton":
+        sendMessageButtonRef.current?.focus();
+        break;
+      case "address":
+        addressRef.current?.focus();
+        break;
+      case "phones":
+        if (typeof editingTarget.index === "number") {
+          phonesRef.current[editingTarget.index]?.focus();
+        }
+        break;
+      case "supportEmail":
+        supportEmailRef.current?.focus();
+        break;
+      case "namePlaceholder":
+        namePlaceholderRef.current?.focus();
+        break;
+      case "emailPlaceholder":
+        emailPlaceholderRef.current?.focus();
+        break;
+      case "websitePlaceholder":
+        websitePlaceholderRef.current?.focus();
+        break;
+      case "messagePlaceholder":
+        messagePlaceholderRef.current?.focus();
+        break;
+      default:
+        break;
+    }
+  }
+}, [editingTarget]);
+
 
   useEffect(() => {
     applyDesignTokens(tokensForContact);

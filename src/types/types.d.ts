@@ -18,26 +18,18 @@ type EditingTarget = {
   index?: number;
 };
 
-type AddWatercraftSectionProps = {
+type ContactProps = {
+  address?: string;
+  phones?: string[];
+  supportEmail?: string;
+  mapSrc?: string;
   showScroll?: boolean;
   isPageInside?: boolean;
   isDesignMode?: boolean;
   page?: string;
-  
+  onSubmit?: (data: { name: string; email: string; website: string; message: string }) => void;
 };
 
 
-type MarketingServicesPromoProps = {
-  showScroll?: boolean;
-  isPageInside?: boolean;
-  isDesignMode?: boolean;
-  page?: string;
-};
 
-type FooterProps = {
-  showScroll?: boolean;
-  isPageInside?: boolean;
-  isDesignMode?: boolean;
-  page?: string;
-  
-};
+
