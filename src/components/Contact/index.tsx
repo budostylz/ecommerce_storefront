@@ -39,6 +39,7 @@ const Contact: React.FC<ContactProps> = (props) => {
   const addressRef = useRef<HTMLTextAreaElement | null>(null);           // Address text
   const phoneLabelRef = useRef<HTMLTextAreaElement | null>(null);        // Phone label text
   const phonesRef = useRef<Array<HTMLTextAreaElement | null>>([]);       // Phone numbers (array)
+  const supportLabelRef = useRef<HTMLTextAreaElement | null>(null); // Support label text
   const supportEmailRef = useRef<HTMLTextAreaElement | null>(null);      // Support email text
 
   // Form field placeholders (optional)
@@ -664,50 +665,171 @@ const showInspector =
                   </li>
 
                   <li style={{ marginBottom: "var(--contact-info-item-gap-contact-1)" }}>
-                    <h6
-                      style={{
-                        fontSize: "var(--contact-info-title-font-size-contact-1)",
-                        fontWeight: "var(--contact-info-title-font-weight-contact-1)",
-                        color: "var(--contact-info-title-color-contact-1)",
-                        marginBottom: "10px",
-                      }}
-                    >
-                      <i
-                        className="fa fa-headphones"
-                        style={{
-                          fontSize: "var(--contact-info-icon-size-contact-1)",
-                          color: "var(--contact-info-icon-color-contact-1)",
-                          marginRight: 5,
-                        }}
-                      />{" "}
-                      Support
-                    </h6>
-                    <p
-                      style={{
-                        fontSize: "var(--contact-info-text-font-size-contact-1)",
-                        color: "var(--contact-info-text-color-contact-1)",
-                        marginBottom: 0,
-                      }}
-                    >
-                      {supportEmail}
-                    </p>
+                    {isDesignMode &&
+                      editingTarget?.componentKey === "contact" &&
+                      editingTarget.field === "supportLabel" ? (
+                        <textarea
+                          ref={supportLabelRef}
+                          value={overlay?.props?.supportLabel ?? "Support"}
+                          onChange={(e) => {
+                            updateComponentProps("/contact", "contact", { supportLabel: e.target.value });
+                          }}
+                          onClick={(e) => {
+                            setClickedInsideInspector();
+                            e.stopPropagation();
+                          }}
+                          style={{
+                            width: "100%",
+                            fontSize: "var(--contact-info-title-font-size-contact-1)",
+                            fontWeight: "var(--contact-info-title-font-weight-contact-1)",
+                            color: "var(--contact-info-title-color-contact-1)",
+                            marginBottom: "10px",
+                            background: "transparent",
+                            border: "none",
+                            outline: "none",
+                            resize: "none",
+                            whiteSpace: "pre-wrap",
+                          }}
+                        />
+                      ) : (
+                        <h6
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (isDesignMode) {
+                              setEditingTarget({
+                                route: "/contact",
+                                componentKey: "contact",
+                                field: "supportLabel",
+                              });
+                            }
+                          }}
+                          style={{
+                            fontSize: "var(--contact-info-title-font-size-contact-1)",
+                            fontWeight: "var(--contact-info-title-font-weight-contact-1)",
+                            color: "var(--contact-info-title-color-contact-1)",
+                            marginBottom: "10px",
+                            cursor: isDesignMode ? "text" : "default",
+                          }}
+                        >
+                          <i
+                            className="fa fa-headphones"
+                            style={{
+                              fontSize: "var(--contact-info-icon-size-contact-1)",
+                              color: "var(--contact-info-icon-color-contact-1)",
+                              marginRight: 5,
+                            }}
+                          />{" "}
+                          {overlay?.props?.supportLabel ?? "Support"}
+                        </h6>
+                      )}
+
+                   {isDesignMode &&
+                      editingTarget?.componentKey === "contact" &&
+                      editingTarget.field === "supportEmail" ? (
+                        <textarea
+                          ref={supportEmailRef}
+                          value={overlay?.props?.supportEmail ?? supportEmail}
+                          onChange={(e) => {
+                            updateComponentProps("/contact", "contact", { supportEmail: e.target.value });
+                          }}
+                          onClick={(e) => {
+                            setClickedInsideInspector();
+                            e.stopPropagation();
+                          }}
+                          style={{
+                            width: "100%",
+                            fontSize: "var(--contact-info-text-font-size-contact-1)",
+                            color: "var(--contact-info-text-color-contact-1)",
+                            marginBottom: 0,
+                            background: "transparent",
+                            border: "none",
+                            outline: "none",
+                            resize: "none",
+                            whiteSpace: "pre-wrap",
+                          }}
+                        />
+                      ) : (
+                        <p
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (isDesignMode) {
+                              setEditingTarget({
+                                route: "/contact",
+                                componentKey: "contact",
+                                field: "supportEmail",
+                              });
+                            }
+                          }}
+                          style={{
+                            fontSize: "var(--contact-info-text-font-size-contact-1)",
+                            color: "var(--contact-info-text-color-contact-1)",
+                            marginBottom: 0,
+                            cursor: isDesignMode ? "text" : "default",
+                          }}
+                        >
+                          {overlay?.props?.supportEmail ?? supportEmail}
+                        </p>
+                      )}
+
                   </li>
                 </ul>
               </div>
 
               <div className="contact__form">
-                <h5
-                  style={{
-                    fontFamily: "var(--contact-form-heading-font-family-contact-1)",
-                    fontSize: "var(--contact-form-heading-font-size-contact-1)",
-                    fontWeight: "var(--contact-form-heading-font-weight-contact-1)",
-                    textTransform: "var(--contact-form-heading-text-transform-contact-1)",
-                    color: "var(--contact-form-heading-color-contact-1)",
-                    marginBottom: "35px",
-                  }}
-                >
-                  SEND MESSAGE
-                </h5>
+               {isDesignMode &&
+                  editingTarget?.componentKey === "contact" &&
+                  editingTarget.field === "sendMessageLabel" ? (
+                    <textarea
+                      ref={sendMessageLabelRef}
+                      value={overlay?.props?.sendMessageLabel ?? "SEND MESSAGE"}
+                      onChange={(e) => {
+                        updateComponentProps("/contact", "contact", { sendMessageLabel: e.target.value });
+                      }}
+                      onClick={(e) => {
+                        setClickedInsideInspector();
+                        e.stopPropagation();
+                      }}
+                      style={{
+                        width: "100%",
+                        fontFamily: "var(--contact-form-heading-font-family-contact-1)",
+                        fontSize: "var(--contact-form-heading-font-size-contact-1)",
+                        fontWeight: "var(--contact-form-heading-font-weight-contact-1)",
+                        textTransform: "var(--contact-form-heading-text-transform-contact-1)",
+                        color: "var(--contact-form-heading-color-contact-1)",
+                        marginBottom: "35px",
+                        background: "transparent",
+                        border: "none",
+                        outline: "none",
+                        resize: "none",
+                        whiteSpace: "pre-wrap",
+                      }}
+                    />
+                  ) : (
+                    <h5
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (isDesignMode) {
+                          setEditingTarget({
+                            route: "/contact",
+                            componentKey: "contact",
+                            field: "sendMessageLabel",
+                          });
+                        }
+                      }}
+                      style={{
+                        fontFamily: "var(--contact-form-heading-font-family-contact-1)",
+                        fontSize: "var(--contact-form-heading-font-size-contact-1)",
+                        fontWeight: "var(--contact-form-heading-font-weight-contact-1)",
+                        textTransform: "var(--contact-form-heading-text-transform-contact-1)",
+                        color: "var(--contact-form-heading-color-contact-1)",
+                        marginBottom: "35px",
+                        cursor: isDesignMode ? "text" : "default",
+                      }}
+                    >
+                      {overlay?.props?.sendMessageLabel ?? "SEND MESSAGE"}
+                    </h5>
+                  )}
+
 
                 <form onSubmit={handleSubmit}>
                   <input

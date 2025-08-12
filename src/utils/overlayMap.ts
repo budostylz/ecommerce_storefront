@@ -12,7 +12,7 @@ export const overlayMap = {
       },
       props: {
         contactInfo:'Contact info',
-        sendMessageLabel:'SEND MESSAGE LABEL',
+        sendMessageLabel:'SEND MESSAGE',
         sendMessageButton:'Send Message Button',
         addressLabel: 'Address',
         address: '66 West Flagler St, Miami, Florida, 33130',
