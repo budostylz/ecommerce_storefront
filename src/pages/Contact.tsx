@@ -22,12 +22,12 @@ const Contact = () => {
 
 
     // 🧪 DEV ONLY: Reset store on mount to preview defaults
-  useEffect(() => {
+  /*useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
       resetToDefaults();
       console.warn("🧼 Store reset to preview defaults (dev only)");
     }
-  }, [resetToDefaults]);
+  }, [resetToDefaults]);*/
 
 
   return (

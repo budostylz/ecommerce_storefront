@@ -904,22 +904,68 @@ const showInspector =
                       resize: "none",
                     }}
                   />
-                  <button
-                    type="submit"
-                    className="site-btn"
-                    style={{
-                      fontSize: "var(--contact-button-font-size-contact-1)",
-                      textTransform: "var(--contact-button-text-transform-contact-1)",
-                      fontWeight: "var(--contact-button-font-weight-contact-1)",
-                      color: "var(--contact-button-text-color-contact-1)",
-                      background: "var(--contact-button-bg-contact-1)",
-                      padding:
-                        "var(--contact-button-padding-y-contact-1) var(--contact-button-padding-x-contact-1)",
-                      borderRadius: "var(--contact-button-border-radius-contact-1)",
-                    }}
-                  >
-                    Send Message
-                  </button>
+                 {isDesignMode &&
+                    editingTarget?.componentKey === "contact" &&
+                    editingTarget.field === "sendMessageButton" ? (
+                      <textarea
+                        ref={sendMessageButtonRef}
+                        value={overlay?.props?.sendMessageButton ?? "Send Message"}
+                        onChange={(e) => {
+                          updateComponentProps("/contact", "contact", { sendMessageButton: e.target.value });
+                        }}
+                        onClick={(e) => {
+                          setClickedInsideInspector();
+                          e.stopPropagation();
+                        }}
+                        style={{
+                          width: "100%",
+                          fontSize: "var(--contact-button-font-size-contact-1)",
+                          textTransform: "var(--contact-button-text-transform-contact-1)",
+                          fontWeight: "var(--contact-button-font-weight-contact-1)",
+                          color: "var(--contact-button-text-color-contact-1)",
+                          background: "var(--contact-button-bg-contact-1)",
+                          padding:
+                            "var(--contact-button-padding-y-contact-1) var(--contact-button-padding-x-contact-1)",
+                          borderRadius: "var(--contact-button-border-radius-contact-1)",
+                          border: "none",
+                          outline: "none",
+                          resize: "none",
+                          whiteSpace: "pre-wrap",
+                          textAlign: "center",
+                        }}
+                      />
+                          ) : (
+                            <div
+                              type="submit"
+                              className="site-btn"
+                              onClick={(e) => {
+                                if (isDesignMode) {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  setEditingTarget({
+                                    route: "/contact",
+                                    componentKey: "contact",
+                                    field: "sendMessageButton",
+                                  });
+                                }
+                              }}
+                              style={{
+                                fontSize: "var(--contact-button-font-size-contact-1)",
+                                textTransform: "var(--contact-button-text-transform-contact-1)",
+                                fontWeight: "var(--contact-button-font-weight-contact-1)",
+                                color: "var(--contact-button-text-color-contact-1)",
+                                background: "var(--contact-button-bg-contact-1)",
+                                padding:
+                                  "var(--contact-button-padding-y-contact-1) var(--contact-button-padding-x-contact-1)",
+                                borderRadius: "var(--contact-button-border-radius-contact-1)",
+                                cursor: isDesignMode ? "text" : "pointer",
+                                textAlign: "center",
+                              }}
+                            >
+                              {overlay?.props?.sendMessageButton ?? "Send Message"}
+                            </div>
+                          )}
+
                 </form>
               </div>
             </div>
