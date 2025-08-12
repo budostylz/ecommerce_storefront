@@ -34,7 +34,7 @@ const Contact = () => {
     <>
       <Header />
       <Preloader />
-      <OffcanvasMenu />
+      {/*<OffcanvasMenu />*/}
       <Breadcrumb />
       <ContactSection />
 

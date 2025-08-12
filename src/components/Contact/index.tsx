@@ -17,8 +17,6 @@ const Contact: React.FC<ContactProps> = (props) => {
   const updateComponentProps = usePreviewStore((s) => s.updateComponentProps);
   const updateDesignToken = usePreviewStore((s) => s.updateDesignToken);
 
-
-
   const editingTarget = usePreviewStore((s) => s.editingTarget);
   const setEditingTarget = usePreviewStore((s) => s.setEditingTarget);
 
@@ -33,10 +31,13 @@ const Contact: React.FC<ContactProps> = (props) => {
   console.log('overlay: ', overlay);
 
   // Refs for editable text fields
+  const sectionRef = useRef<HTMLElement | null>(null);                   // Parent Ref
   const contactInfoRef = useRef<HTMLTextAreaElement | null>(null);       // "Contact info" heading
+  const addressLabelRef = useRef<HTMLTextAreaElement | null>(null);      // Address Label
   const sendMessageLabelRef = useRef<HTMLTextAreaElement | null>(null);  // "SEND MESSAGE" label
   const sendMessageButtonRef = useRef<HTMLTextAreaElement | null>(null); // "Send Message" button text
   const addressRef = useRef<HTMLTextAreaElement | null>(null);           // Address text
+  const phoneLabelRef = useRef<HTMLTextAreaElement | null>(null);        // Phone label text
   const phonesRef = useRef<Array<HTMLTextAreaElement | null>>([]);       // Phone numbers (array)
   const supportEmailRef = useRef<HTMLTextAreaElement | null>(null);      // Support email text
 
@@ -177,6 +178,48 @@ useEffect(() => {
     applyDesignTokens(tokensForContact);
   }, [tokensForContact]);
 
+  useEffect(() => {
+  if (!isDesignMode) return;
+
+  const onGlobalPointerDown = (e: MouseEvent) => {
+    const root = sectionRef.current;
+    const target = e.target as Node | null;
+
+    // Ignore if we don’t have a section yet
+    if (!root || !target) return;
+
+    // If the click is inside the Contact section, do nothing
+    if (root.contains(target)) return;
+
+    // If your inspector sets a guard when clicked inside it, respect it
+    // (Assumes your inspector calls setClickedInsideInspector(); use whatever getter you have.)
+    // e.g. if you have: wasClickInsideInspector()
+    // if (wasClickInsideInspector()) return;
+
+    // Otherwise: exit edit mode for Contact
+    setEditingTarget(null);
+    // If you also show a floating panel, you can hide it too (if you store this):
+    // setShowInspector(false);
+  };
+
+  // capture phase so we run before other handlers stopPropagation
+  document.addEventListener("pointerdown", onGlobalPointerDown, true);
+  return () => {
+    document.removeEventListener("pointerdown", onGlobalPointerDown, true);
+  };
+}, [isDesignMode, setEditingTarget]);
+
+useEffect(() => {
+  if (!isDesignMode) return;
+  const onKey = (e: KeyboardEvent) => {
+    if (e.key === "Escape") setEditingTarget(null);
+  };
+  window.addEventListener("keydown", onKey);
+  return () => window.removeEventListener("keydown", onKey);
+}, [isDesignMode, setEditingTarget]);
+
+
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
@@ -200,6 +243,8 @@ const handleStyleChange = (updates: StyleUpdates) => {
   const setToken = (token: string, val: string) => {
     updateDesignToken(token, normalizeValue(token, val));
   };
+
+  
 
   const mapCommon = (prefix: string) => {
     // Common text props for headings/labels
@@ -311,6 +356,7 @@ const showInspector =
 
   return (
     <section
+      ref={sectionRef} 
       id={overlay?.id ?? "component-contact"}
       className="contact spad"
       style={{
@@ -384,54 +430,174 @@ const showInspector =
 
                 <ul style={{ marginBottom: "var(--contact-info-item-gap-contact-1)" }}>
                   <li style={{ marginBottom: "var(--contact-info-item-gap-contact-1)" }}>
-                    <h6
-                      style={{
-                        fontSize: "var(--contact-info-title-font-size-contact-1)",
-                        fontWeight: "var(--contact-info-title-font-weight-contact-1)",
-                        color: "var(--contact-info-title-color-contact-1)",
-                        marginBottom: "10px",
-                      }}
-                    >
-                      <i
-                        className="fa fa-map-marker"
-                        style={{
-                          fontSize: "var(--contact-info-icon-size-contact-1)",
-                          color: "var(--contact-info-icon-color-contact-1)",
-                          marginRight: 5,
-                        }}
-                      />{" "}
-                      Address
-                    </h6>
-                    <p
-                      style={{
-                        fontSize: "var(--contact-info-text-font-size-contact-1)",
-                        color: "var(--contact-info-text-color-contact-1)",
-                        marginBottom: 0,
-                      }}
-                    >
-                      {address}
-                    </p>
+                    {isDesignMode &&
+                        editingTarget?.componentKey === "contact" &&
+                        editingTarget.field === "addressLabel" ? (
+                          <textarea
+                            ref={addressLabelRef}
+                            value={overlay?.props?.addressLabel ?? "Address"}
+                            onChange={(e) => {
+                              updateComponentProps("/contact", "contact", { addressLabel: e.target.value });
+                            }}
+                            onClick={(e) => {
+                              setClickedInsideInspector();
+                              e.stopPropagation();
+                            }}
+                            style={{
+                              width: "100%",
+                              fontSize: "var(--contact-info-title-font-size-contact-1)",
+                              fontWeight: "var(--contact-info-title-font-weight-contact-1)",
+                              color: "var(--contact-info-title-color-contact-1)",
+                              marginBottom: "10px",
+                              background: "transparent",
+                              border: "none",
+                              outline: "none",
+                              resize: "none",
+                              whiteSpace: "pre-wrap",
+                            }}
+                          />
+                        ) : (
+                          <h6
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (isDesignMode) {
+                                setEditingTarget({
+                                  route: "/contact",
+                                  componentKey: "contact",
+                                  field: "addressLabel",
+                                });
+                              }
+                            }}
+                            style={{
+                              fontSize: "var(--contact-info-title-font-size-contact-1)",
+                              fontWeight: "var(--contact-info-title-font-weight-contact-1)",
+                              color: "var(--contact-info-title-color-contact-1)",
+                              marginBottom: "10px",
+                              cursor: isDesignMode ? "text" : "default",
+                            }}
+                          >
+                            <i
+                              className="fa fa-map-marker"
+                              style={{
+                                fontSize: "var(--contact-info-icon-size-contact-1)",
+                                color: "var(--contact-info-icon-color-contact-1)",
+                                marginRight: 5,
+                              }}
+                            />
+                            {overlay?.props?.addressLabel ?? "Address"}
+                          </h6>
+                        )}
+
+                   {isDesignMode &&
+                      editingTarget?.componentKey === "contact" &&
+                      editingTarget.field === "address" ? (
+                        <textarea
+                          ref={addressRef}
+                          value={overlay?.props?.address ?? address}
+                          onChange={(e) => {
+                            updateComponentProps("/contact", "contact", { address: e.target.value });
+                          }}
+                          onClick={(e) => {
+                            setClickedInsideInspector();
+                            e.stopPropagation();
+                          }}
+                          style={{
+                            width: "100%",
+                            fontSize: "var(--contact-info-text-font-size-contact-1)",
+                            color: "var(--contact-info-text-color-contact-1)",
+                            marginBottom: 0,
+                            background: "transparent",
+                            border: "none",
+                            outline: "none",
+                            resize: "none",
+                            whiteSpace: "pre-wrap",
+                          }}
+                        />
+                      ) : (
+                        <p
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (isDesignMode) {
+                              setEditingTarget({
+                                route: "/contact",
+                                componentKey: "contact",
+                                field: "address",
+                              });
+                            }
+                          }}
+                          style={{
+                            fontSize: "var(--contact-info-text-font-size-contact-1)",
+                            color: "var(--contact-info-text-color-contact-1)",
+                            marginBottom: 0,
+                            cursor: isDesignMode ? "text" : "default",
+                          }}
+                        >
+                          {overlay?.props?.address ?? address}
+                        </p>
+                      )}
+
                   </li>
 
                   <li style={{ marginBottom: "var(--contact-info-item-gap-contact-1)" }}>
-                    <h6
-                      style={{
-                        fontSize: "var(--contact-info-title-font-size-contact-1)",
-                        fontWeight: "var(--contact-info-title-font-weight-contact-1)",
-                        color: "var(--contact-info-title-color-contact-1)",
-                        marginBottom: "10px",
-                      }}
-                    >
-                      <i
-                        className="fa fa-phone"
-                        style={{
-                          fontSize: "var(--contact-info-icon-size-contact-1)",
-                          color: "var(--contact-info-icon-color-contact-1)",
-                          marginRight: 5,
-                        }}
-                      />{" "}
-                      Phone
-                    </h6>
+                   {isDesignMode &&
+                      editingTarget?.componentKey === "contact" &&
+                      editingTarget.field === "phoneLabel" ? (
+                        <textarea
+                          ref={phoneLabelRef}
+                          value={overlay?.props?.phoneLabel ?? "Phone"}
+                          onChange={(e) => {
+                            updateComponentProps("/contact", "contact", { phoneLabel: e.target.value });
+                          }}
+                          onClick={(e) => {
+                            setClickedInsideInspector();
+                            e.stopPropagation();
+                          }}
+                          style={{
+                            width: "100%",
+                            fontSize: "var(--contact-info-title-font-size-contact-1)",
+                            fontWeight: "var(--contact-info-title-font-weight-contact-1)",
+                            color: "var(--contact-info-title-color-contact-1)",
+                            marginBottom: "10px",
+                            background: "transparent",
+                            border: "none",
+                            outline: "none",
+                            resize: "none",
+                            whiteSpace: "pre-wrap",
+                          }}
+                        />
+                      ) : (
+                        <h6
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (isDesignMode) {
+                              setEditingTarget({
+                                route: "/contact",
+                                componentKey: "contact",
+                                field: "phoneLabel",
+                              });
+                            }
+                          }}
+                          style={{
+                            fontSize: "var(--contact-info-title-font-size-contact-1)",
+                            fontWeight: "var(--contact-info-title-font-weight-contact-1)",
+                            color: "var(--contact-info-title-color-contact-1)",
+                            marginBottom: "10px",
+                            cursor: isDesignMode ? "text" : "default",
+                          }}
+                        >
+                          <i
+                            className="fa fa-phone"
+                            style={{
+                              fontSize: "var(--contact-info-icon-size-contact-1)",
+                              color: "var(--contact-info-icon-color-contact-1)",
+                              marginRight: 5,
+                            }}
+                          />{" "}
+                          {overlay?.props?.phoneLabel ?? "Phone"}
+                        </h6>
+                      )}
+
+                   {/* Phone Numbers (editable array) */}
                     <p
                       style={{
                         fontSize: "var(--contact-info-text-font-size-contact-1)",
@@ -439,15 +605,62 @@ const showInspector =
                         marginBottom: 0,
                       }}
                     >
-                      {phones.map((p, i) => (
-                        <span
-                          key={i}
-                          style={{ marginRight: "var(--contact-info-chip-gap-contact-1)" }}
-                        >
-                          {p}
-                        </span>
-                      ))}
+                      {phones.map((p, i) =>
+                        isDesignMode &&
+                        editingTarget?.componentKey === "contact" &&
+                        editingTarget.field === "phones" &&
+                        editingTarget.index === i ? (
+                          <textarea
+                            key={i}
+                            ref={(el) => {
+                              phonesRef.current[i] = el;
+                            }}
+                            value={overlay?.props?.phones?.[i] ?? ""}
+                             onChange={(e) => {
+                                const updated = [...(overlay?.props?.phones || [])];
+                                updated[i] = e.target.value;
+                                updateComponentProps("/contact", "contact", { phones: updated });
+                              }}
+                            onClick={(e) => {
+                              setClickedInsideInspector();
+                              e.stopPropagation();
+                            }}
+                            style={{
+                              fontSize: "var(--contact-info-text-font-size-contact-1)",
+                              color: "var(--contact-info-text-color-contact-1)",
+                              marginRight: "var(--contact-info-chip-gap-contact-1)",
+                              background: "transparent",
+                              border: "none",
+                              outline: "none",
+                              resize: "none",
+                              display: "inline-block",
+                            }}
+                          />
+                        ) : (
+                          <span
+                            key={i}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (isDesignMode) {
+                                setEditingTarget({
+                                  route: "/contact",
+                                  componentKey: "contact",
+                                  field: "phones",
+                                  index: i,
+                                });
+                              }
+                            }}
+                            style={{
+                              marginRight: "var(--contact-info-chip-gap-contact-1)",
+                              cursor: isDesignMode ? "pointer" : "default",
+                            }}
+                          >
+                            {overlay?.props?.phones?.[i] ?? p}
+                          </span>
+                        )
+                      )}
                     </p>
+
                   </li>
 
                   <li style={{ marginBottom: "var(--contact-info-item-gap-contact-1)" }}>
