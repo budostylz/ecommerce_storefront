@@ -12,25 +12,26 @@ import FloatingStyleInspector from "@components/FloatingStyleInspector";
 const Footer: React.FC<Footerrops> = (props) => {
   const currentYear = new Date().getFullYear();
 
-  // Zustand state
-  const overlayState = usePreviewStore((s) => s.overlayMap);
-  const tokensBag = usePreviewStore((s) => s.designTokens);
+  // Zustand state for Footer
+  const footerOverlayState = usePreviewStore((s) => s.overlayMap);
+  const footerTokensBag = usePreviewStore((s) => s.designTokens);
 
-  const updateComponentProps = usePreviewStore((s) => s.updateComponentProps);
-  const updateDesignToken = usePreviewStore((s) => s.updateDesignToken);
+  const updateFooterComponentProps = usePreviewStore((s) => s.updateComponentProps);
+  const updateFooterDesignToken = usePreviewStore((s) => s.updateDesignToken);
 
-  const editingTarget = usePreviewStore((s) => s.editingTarget);
-  const setEditingTarget = usePreviewStore((s) => s.setEditingTarget);
+  const footerEditingTarget = usePreviewStore((s) => s.editingTarget);
+  const setFooterEditingTarget = usePreviewStore((s) => s.setEditingTarget);
 
   // This component’s overlay node
-  const overlay = overlayState?.["global"]?.footer;
+  const footerOverlay = footerOverlayState?.["global"]?.footer;
 
-  console.log('overlayState-footer: ', overlayState);
-  console.log('tokensBag-footer: ', tokensBag);
-  console.log('updateDesignToken-footer: ', updateDesignToken);
-  console.log('editingTarget-footer: ', editingTarget);
-  console.log('setEditingTarget-footer: ', setEditingTarget);
-  console.log('overlay-footer: ', overlay);
+  console.log("footerOverlayState: ", footerOverlayState);
+  console.log("footerTokensBag: ", footerTokensBag);
+  console.log("updateFooterDesignToken: ", updateFooterDesignToken);
+  console.log("footerEditingTarget: ", footerEditingTarget);
+  console.log("setFooterEditingTarget: ", setFooterEditingTarget);
+  console.log("footerOverlay: ", footerOverlay);
+
 
   // Refs for editable text fields in Footer
 const footerSectionRef = useRef<HTMLElement | null>(null);            // Parent Ref (Footer wrapper)
@@ -63,103 +64,383 @@ const copyrightTextRef = useRef<HTMLTextAreaElement | null>(null);     // Copyri
 const [isMobileOrTablet, setIsMobileOrTablet] = useState(false);
 
 
-  // Merge overlay props (if any) with incoming props; incoming wins
-  const {
-    logo,
-    aboutText,
-    quickLinksTitle,
-    quickLinks,
-    accountTitle,
-    accountLinks,
-    newsletterTitle,
-    newsletterPlaceholder,
-    newsletterButton,
-    socialLinks,
-    paymentButtons,
-    copyrightText,
-    onSubscribe,
-    isDesignMode,
-  } = {
-    logo:
-      props.logo ??
-      overlay?.props?.logo ??
-      "https://storage.googleapis.com/budoapps-5aacf.firebasestorage.app/templates/ecommerce/fashio/logo.png",
+// Merge overlay props (if any) with incoming props; incoming wins
+const {
+  logo,
+  aboutText,
+  quickLinksTitle,
+  quickLinks,
+  accountTitle,
+  accountLinks,
+  newsletterTitle,
+  newsletterPlaceholder,
+  newsletterButton,
+  socialLinks,
+  paymentButtons,
+  copyrightText,
+  onSubscribe,
+  isDesignMode,
+} = {
+  logo:
+    props.logo ??
+    footerOverlay?.props?.logo ??
+    "https://storage.googleapis.com/budoapps-5aacf.firebasestorage.app/templates/ecommerce/fashio/logo.png",
 
-    aboutText:
-      props.aboutText ??
-      overlay?.props?.aboutText ??
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt cilisis.",
+  aboutText:
+    props.aboutText ??
+    footerOverlay?.props?.aboutText ??
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt cilisis.",
 
-    quickLinksTitle:
-      props.quickLinksTitle ??
-      overlay?.props?.quickLinksTitle ??
-      "QUICK LINKS",
+  quickLinksTitle:
+    props.quickLinksTitle ??
+    footerOverlay?.props?.quickLinksTitle ??
+    "QUICK LINKS",
 
-    quickLinks:
-      props.quickLinks ??
-      overlay?.props?.quickLinks ??
-      ["About", "Blogs", "Contact", "FAQ"],
+  quickLinks:
+    props.quickLinks ??
+    footerOverlay?.props?.quickLinks ??
+    ["About", "Blogs", "Contact", "FAQ"],
 
-    accountTitle:
-      props.accountTitle ??
-      overlay?.props?.accountTitle ??
-      "ACCOUNT",
+  accountTitle:
+    props.accountTitle ??
+    footerOverlay?.props?.accountTitle ??
+    "ACCOUNT",
 
-    accountLinks:
-      props.accountLinks ??
-      overlay?.props?.accountLinks ??
-      ["My Account", "Orders Tracking", "Checkout", "Wishlist"],
+  accountLinks:
+    props.accountLinks ??
+    footerOverlay?.props?.accountLinks ??
+    ["My Account", "Orders Tracking", "Checkout", "Wishlist"],
 
-    newsletterTitle:
-      props.newsletterTitle ??
-      overlay?.props?.newsletterTitle ??
-      "NEWSLETTER",
+  newsletterTitle:
+    props.newsletterTitle ??
+    footerOverlay?.props?.newsletterTitle ??
+    "NEWSLETTER",
 
-    newsletterPlaceholder:
-      props.newsletterPlaceholder ??
-      overlay?.props?.newsletterPlaceholder ??
-      "Email",
+  newsletterPlaceholder:
+    props.newsletterPlaceholder ??
+    footerOverlay?.props?.newsletterPlaceholder ??
+    "Email",
 
-    newsletterButton:
-      props.newsletterButton ??
-      overlay?.props?.newsletterButton ??
-      "Subscribe",
+  newsletterButton:
+    props.newsletterButton ??
+    footerOverlay?.props?.newsletterButton ??
+    "Subscribe",
 
-    socialLinks:
-      props.socialLinks ??
-      overlay?.props?.socialLinks ?? [
-        { icon: "fa fa-facebook", href: "#" },
-        { icon: "fa fa-twitter", href: "#" },
-        { icon: "fa fa-youtube-play", href: "#" },
-        { icon: "fa fa-instagram", href: "#" },
-        { icon: "fa fa-pinterest", href: "#" },
-      ],
+  socialLinks:
+    props.socialLinks ??
+    footerOverlay?.props?.socialLinks ?? [
+      { icon: "fa fa-facebook", href: "#" },
+      { icon: "fa fa-twitter", href: "#" },
+      { icon: "fa fa-youtube-play", href: "#" },
+      { icon: "fa fa-instagram", href: "#" },
+      { icon: "fa fa-pinterest", href: "#" },
+    ],
 
-    // list of image srcs for the payment badges
-    paymentButtons:
-      props.paymentButtons ??
-      overlay?.props?.paymentButtons ?? [
-        "/origin/base/web/img/payment/payment-1.png",
-        "/origin/base/web/img/payment/payment-2.png",
-        "/origin/base/web/img/payment/payment-3.png",
-        "/origin/base/web/img/payment/payment-4.png",
-        "/origin/base/web/img/payment/payment-5.png",
-      ],
+  // list of image srcs for the payment badges
+  paymentButtons:
+    props.paymentButtons ??
+    footerOverlay?.props?.paymentButtons ?? [
+      "/origin/base/web/img/payment/payment-1.png",
+      "/origin/base/web/img/payment/payment-2.png",
+      "/origin/base/web/img/payment/payment-3.png",
+      "/origin/base/web/img/payment/payment-4.png",
+      "/origin/base/web/img/payment/payment-5.png",
+    ],
 
-    copyrightText:
-      props.copyrightText ??
-      overlay?.props?.copyrightText ??
-      `© ${new Date().getFullYear()} Crafted with passion <span aria-hidden="true">⚡️</span> on <a href="https://budoboost.com" target="_blank" rel="noopener noreferrer">BudoBoost</a> — Empowering creators to launch beautiful sites in minutes.`,
+  copyrightText:
+    props.copyrightText ??
+    footerOverlay?.props?.copyrightText ??
+    `© ${new Date().getFullYear()} Crafted with passion <span aria-hidden="true">⚡️</span> on <a href="https://budoboost.com" target="_blank" rel="noopener noreferrer">BudoBoost</a> — Empowering creators to launch beautiful sites in minutes.`,
 
-    onSubscribe: props.onSubscribe, // optional handler for newsletter submit
-    isDesignMode: props.isDesignMode ?? true,
-  } as const;
-    
-  console.log('isDesignMode: ', isDesignMode);
+  onSubscribe: props.onSubscribe, // optional handler for newsletter submit
+  isDesignMode: props.isDesignMode ?? true,
+} as const;
+console.log('isDesignMode: ', isDesignMode);
 
 
-  
+// Only apply the tokens that this overlay cares about (values from designTokens)
+const tokensForFooter = useMemo(() => {
+  const keys = footerOverlay?.tokens ?? [];
+  const subset: Record<string, string> = {};
+  keys.forEach((k: string) => {
+    if (k in designTokens) subset[k] = (designTokens as any)[k];
+  });
+  // If overlay is missing (e.g., during dev), just fall back to all tokens
+  return Object.keys(subset).length ? subset : designTokens;
+}, [footerOverlay, designTokens]);
 
+
+
+  useEffect(() => {
+    const checkDevice = () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const isTablet = w <= 1024 && w > 640;
+      const isMobile = w <= 640;
+      const isLandscape = w > h;
+      setIsMobileOrTablet(isMobile || isTablet || isLandscape);
+    };
+    checkDevice();
+    window.addEventListener("resize", checkDevice);
+    window.addEventListener("orientationchange", checkDevice);
+    return () => {
+      window.removeEventListener("resize", checkDevice);
+      window.removeEventListener("orientationchange", checkDevice);
+    };
+  }, []);
+
+  useEffect(() => {
+  console.log('footerEditingTarget CHECK: ', footerEditingTarget);
+  if (footerEditingTarget?.componentKey === "footer") {
+    switch (footerEditingTarget.field) {
+      case "logo":
+        logoRef.current?.focus();
+        break;
+      case "aboutText":
+        aboutTextRef.current?.focus();
+        break;
+      case "quickLinksTitle":
+        quickLinksTitleRef.current?.focus();
+        break;
+      case "quickLinks":
+        if (typeof footerEditingTarget.index === "number") {
+          quickLinksRef.current[footerEditingTarget.index]?.focus();
+        }
+        break;
+      case "accountTitle":
+        accountTitleRef.current?.focus();
+        break;
+      case "accountLinks":
+        if (typeof footerEditingTarget.index === "number") {
+          accountLinksRef.current[footerEditingTarget.index]?.focus();
+        }
+        break;
+      case "newsletterTitle":
+        newsletterTitleRef.current?.focus();
+        break;
+      case "newsletterPlaceholder":
+        newsletterPlaceholderRef.current?.focus();
+        break;
+      case "newsletterButton":
+        newsletterButtonRef.current?.focus();
+        break;
+      case "socialLinks":
+        if (typeof footerEditingTarget.index === "number") {
+          socialLinksRef.current[footerEditingTarget.index]?.focus();
+        }
+        break;
+      case "paymentButtons":
+        if (typeof footerEditingTarget.index === "number") {
+          paymentButtonsRef.current[footerEditingTarget.index]?.focus();
+        }
+        break;
+      case "copyrightText":
+        copyrightTextRef.current?.focus();
+        break;
+      default:
+        break;
+    }
+  }
+}, [footerEditingTarget]);
+
+useEffect(() => {
+  if (!isDesignMode || !footerEditingTarget) return;
+  if (footerEditingTarget.componentKey !== "footer") return;
+
+  const field = footerEditingTarget.field; // e.g., "logo", "aboutText", "quickLinksTitle"
+  const page = "global"; // Footer lives under overlayMap["global"]
+
+  const prefix = `--footer-${field}-`;
+  const suffix = `global-1`; // Matches your overlayMap token naming scheme
+
+  const filteredKeys = (overlayMap[page]?.footer?.tokens || []).filter(
+    (key: string) => key.startsWith(prefix) && key.endsWith(suffix)
+  );
+
+  filteredKeys.forEach((key: string) => {
+    const value = designTokens[key];
+    if (value !== undefined) {
+      document.documentElement.style.setProperty(key, value);
+    }
+  });
+}, [designTokens, footerEditingTarget, isDesignMode]);
+
+useEffect(() => {
+  applyDesignTokens(tokensForFooter);
+}, [tokensForFooter]);
+
+useEffect(() => {
+  if (!isDesignMode) return;
+
+  const onGlobalPointerDown = (e: MouseEvent) => {
+    const root = footerSectionRef.current;
+    const target = e.target as Node | null;
+
+    // Ignore if we don’t have a section yet
+    if (!root || !target) return;
+
+    // If the click is inside the Footer section, do nothing
+    if (root.contains(target)) return;
+
+    // Respect inspector click guard
+    // if (wasClickInsideInspector()) return;
+
+    // Otherwise: exit edit mode for Footer
+    setFooterEditingTarget(null);
+  };
+
+  // Capture phase so we run before other handlers stopPropagation
+  document.addEventListener("pointerdown", onGlobalPointerDown, true);
+  return () => {
+    document.removeEventListener("pointerdown", onGlobalPointerDown, true);
+  };
+}, [isDesignMode, setFooterEditingTarget]);
+
+useEffect(() => {
+  if (!isDesignMode) return;
+  const onKey = (e: KeyboardEvent) => {
+    if (e.key === "Escape") setFooterEditingTarget(null);
+  };
+  window.addEventListener("keydown", onKey);
+  return () => window.removeEventListener("keydown", onKey);
+}, [isDesignMode, setFooterEditingTarget]);
+
+// Newsletter form state
+const [newsletterForm, setNewsletterForm] = useState({ email: "" });
+
+// Change handler
+const handleNewsletterChange = (
+  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+) => setNewsletterForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+
+// Submit handler
+const handleNewsletterSubmit = (e: React.FormEvent) => {
+  e.preventDefault();
+  onSubscribe?.(newsletterForm);
+  setNewsletterForm({ email: "" });
+};
+
+// Suffix for design tokens naming
+const FOOTER_SUFFIX = "global-1";
+
+const handleStyleChange = (updates: StyleUpdates) => {
+  if (!footerEditingTarget || footerEditingTarget.componentKey !== "footer") return;
+
+  const { field } = footerEditingTarget;
+
+  const setToken = (token: string, val: string) => {
+    updateDesignToken(token, normalizeValue(token, val));
+  };
+
+  // generic text family: font, size, weight, transform, align, line-height, color
+  const mapCommon = (prefix: string) => {
+    if (updates.fontFamily)   setToken(`--${prefix}-font-family-${GLOBAL_SUFFIX}`, updates.fontFamily);
+    if (updates.fontSize)     setToken(`--${prefix}-font-size-${GLOBAL_SUFFIX}`, updates.fontSize);
+    if (updates.fontWeight)   setToken(`--${prefix}-font-weight-${GLOBAL_SUFFIX}`, String(updates.fontWeight));
+    if (updates.textTransform)setToken(`--${prefix}-text-transform-${GLOBAL_SUFFIX}`, updates.textTransform);
+    if (updates.textAlign)    setToken(`--${prefix}-text-align-${GLOBAL_SUFFIX}`, updates.textAlign);
+    if (updates.lineHeight)   setToken(`--${prefix}-line-height-${GLOBAL_SUFFIX}`, String(updates.lineHeight));
+    if (updates.textColor)    setToken(`--${prefix}-color-${GLOBAL_SUFFIX}`, updates.textColor);
+  };
+
+  switch (field) {
+    /** Whole footer section container */
+    case "section": {
+      if (updates.backgroundColor) setToken(`--footer-section-bg-${GLOBAL_SUFFIX}`, updates.backgroundColor);
+      if (updates.paddingTop)      setToken(`--footer-padding-top-${GLOBAL_SUFFIX}`, updates.paddingTop);
+      if (updates.paddingBottom)   setToken(`--footer-padding-bottom-${GLOBAL_SUFFIX}`, updates.paddingBottom);
+      break;
+    }
+
+    /** Logo block */
+    case "logo": {
+      if (updates.maxWidth) setToken(`--footer-logo-max-width-${GLOBAL_SUFFIX}`, updates.maxWidth);
+      break;
+    }
+
+    /** About paragraph text */
+    case "aboutText": {
+      mapCommon("footer-about-text");
+      break;
+    }
+
+    /** Column headings: Quick Links / Account / Newsletter */
+    case "quickLinksTitle":
+    case "accountTitle":
+    case "newsletterTitle": {
+      mapCommon("footer-widget-title");
+      break;
+    }
+
+    /** Link lists (Quick Links, Account) */
+    case "quickLinks":
+    case "accountLinks": {
+      if (updates.fontSize)  setToken(`--footer-link-font-size-${GLOBAL_SUFFIX}`, updates.fontSize);
+      if (updates.textColor) setToken(`--footer-link-color-${GLOBAL_SUFFIX}`, updates.textColor);
+      if (updates.hoverColor)setToken(`--footer-link-hover-color-${GLOBAL_SUFFIX}`, updates.hoverColor);
+      if (updates.gap)       setToken(`--footer-link-gap-${GLOBAL_SUFFIX}`, updates.gap);
+      break;
+    }
+
+    /** Newsletter input */
+    case "newsletterInput": {
+      if (updates.height)        setToken(`--footer-newsletter-input-height-${GLOBAL_SUFFIX}`, updates.height);
+      if (updates.fontSize)      setToken(`--footer-newsletter-input-font-size-${GLOBAL_SUFFIX}`, updates.fontSize);
+      if (updates.textColor)     setToken(`--footer-newsletter-input-text-color-${GLOBAL_SUFFIX}`, updates.textColor);
+      if (updates.backgroundColor) setToken(`--footer-newsletter-input-bg-${GLOBAL_SUFFIX}`, updates.backgroundColor);
+      if (updates.borderColor)   setToken(`--footer-newsletter-input-border-color-${GLOBAL_SUFFIX}`, updates.borderColor);
+      if (updates.borderRadius)  setToken(`--footer-newsletter-input-border-radius-${GLOBAL_SUFFIX}`, updates.borderRadius);
+      if (updates.paddingX)      setToken(`--footer-newsletter-input-padding-x-${GLOBAL_SUFFIX}`, updates.paddingX);
+      break;
+    }
+
+    /** Newsletter button */
+    case "newsletterButton": {
+      if (updates.fontSize)      setToken(`--footer-newsletter-button-font-size-${GLOBAL_SUFFIX}`, updates.fontSize);
+      if (updates.textTransform) setToken(`--footer-newsletter-button-text-transform-${GLOBAL_SUFFIX}`, updates.textTransform);
+      if (updates.fontWeight)    setToken(`--footer-newsletter-button-font-weight-${GLOBAL_SUFFIX}`, String(updates.fontWeight));
+      if (updates.textColor)     setToken(`--footer-newsletter-button-text-color-${GLOBAL_SUFFIX}`, updates.textColor);
+      if (updates.backgroundColor) setToken(`--footer-newsletter-button-bg-${GLOBAL_SUFFIX}`, updates.backgroundColor);
+      if (updates.borderRadius)  setToken(`--footer-newsletter-button-border-radius-${GLOBAL_SUFFIX}`, updates.borderRadius);
+      if (updates.padding) {
+        const parts = updates.padding.trim().split(/\s+/);
+        let py = parts[0], px = parts[0];
+        if (parts.length === 2)      { py = parts[0]; px = parts[1]; }
+        else if (parts.length === 3) { py = parts[0]; px = parts[1]; }
+        else if (parts.length >= 4)  { py = parts[0]; px = parts[1]; }
+        setToken(`--footer-newsletter-button-padding-y-${GLOBAL_SUFFIX}`, py);
+        setToken(`--footer-newsletter-button-padding-x-${GLOBAL_SUFFIX}`, px);
+      }
+      break;
+    }
+
+    /** Social icons row */
+    case "socialLinks": {
+      if (updates.iconSize)      setToken(`--footer-social-icon-size-${GLOBAL_SUFFIX}`, updates.iconSize);
+      if (updates.iconColor)     setToken(`--footer-social-icon-color-${GLOBAL_SUFFIX}`, updates.iconColor);
+      if (updates.backgroundColor) setToken(`--footer-social-bg-${GLOBAL_SUFFIX}`, updates.backgroundColor);
+      if (updates.gap)           setToken(`--footer-social-gap-${GLOBAL_SUFFIX}`, updates.gap);
+      break;
+    }
+
+    /** Payment badges row */
+    case "paymentButtons": {
+      if (updates.iconHeight) setToken(`--footer-payment-icon-height-${GLOBAL_SUFFIX}`, updates.iconHeight);
+      if (updates.gap)        setToken(`--footer-payment-gap-${GLOBAL_SUFFIX}`, updates.gap);
+      break;
+    }
+
+    /** Copyright line */
+    case "copyrightText": {
+      mapCommon("footer-copyright-text"); // will set text color / font props if provided
+      if (updates.linkColor) setToken(`--footer-copyright-link-color-${GLOBAL_SUFFIX}`, updates.linkColor);
+      break;
+    }
+
+    default:
+      break;
+  }
+};
 
 
 

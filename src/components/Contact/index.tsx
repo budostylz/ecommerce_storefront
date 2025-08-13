@@ -50,7 +50,6 @@ const Contact: React.FC<ContactProps> = (props) => {
 
   // Device detection
   const [isMobileOrTablet, setIsMobileOrTablet] = useState(false);
-  //console.log('isDesignMode: ', isDesignMode);
 
 
 
@@ -76,6 +75,7 @@ const Contact: React.FC<ContactProps> = (props) => {
   };
 
   const [form, setForm] = useState({ name: "", email: "", website: "", message: "" });
+  //console.log('isDesignMode: ', isDesignMode);
 
 
   // Only apply the tokens that this overlay cares about (values from designTokens)
@@ -89,7 +89,7 @@ const Contact: React.FC<ContactProps> = (props) => {
     });
     // If overlay is missing (e.g., during dev), just fall back to all tokens
     return Object.keys(subset).length ? subset : designTokens;
-  }, [overlay]);
+  }, [overlay, designTokens]);
 
     useEffect(() => {
     const checkDevice = () => {
