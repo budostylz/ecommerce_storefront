@@ -34,6 +34,7 @@ const Footer: React.FC<Footerrops> = (props) => {
 
 
   // Refs for editable text fields in Footer
+const clickPositionRef = useRef<number | null>(null);
 const footerSectionRef = useRef<HTMLElement | null>(null);            // Parent Ref (Footer wrapper)
 const logoRef = useRef<HTMLInputElement | null>(null);                 // Logo image URL
 const aboutTextRef = useRef<HTMLTextAreaElement | null>(null);         // About text
@@ -204,7 +205,7 @@ const tokensForFooter = useMemo(() => {
         break;
       case "quickLinks":
         if (typeof footerEditingTarget.index === "number") {
-          quickLinksRef.current[footerEditingTarget.index]?.focus();
+          quickLinksRefs.current[footerEditingTarget.index]?.focus();
         }
         break;
       case "accountTitle":
@@ -485,7 +486,7 @@ const showFooterInspector =
 
 
 
-  //////////////////////
+  /* Footer - Account List */
 
   // 1) stable default once
     const DEFAULT_ACCOUNT_LINKS = useMemo(
@@ -526,6 +527,49 @@ const showFooterInspector =
     }, [isDesignMode, footerEditingTarget]);
 
 
+/* Footer - Quick Links List */
+
+     // Defaults (stable)
+const DEFAULT_QUICK_LINKS = React.useMemo(
+  () => ["About", "Blogs", "Contact", "FAQ"],
+  []
+);
+
+// Read from store/overlay (or defaults)
+const quickLinksFromStore =
+  footerOverlay?.props?.quickLinks ?? DEFAULT_QUICK_LINKS;
+
+// Local draft for instant typing
+const [quickLinksDraft, setQuickLinksDraft] = React.useState(quickLinksFromStore);
+
+// Keep draft in sync when the store changes or when switching edit targets
+useEffect(() => {
+  setQuickLinksDraft(quickLinksFromStore);
+}, [quickLinksFromStore, footerEditingTarget]);
+
+// Debounced commit to overlay map
+const quickLinksDebounceRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+const commitQuickLinks = (next: string[]) => {
+  if (quickLinksDebounceRef.current) clearTimeout(quickLinksDebounceRef.current);
+  quickLinksDebounceRef.current = setTimeout(() => {
+    updateFooterComponentProps("global", "footer", { quickLinks: next });
+  }, 150);
+};
+
+
+  useEffect(() => {
+    if (
+      isDesignMode &&
+      footerEditingTarget?.componentKey === "footer" &&
+      footerEditingTarget.field === "quickLinks" &&
+      typeof footerEditingTarget.index === "number"
+    ) {
+      quickLinksRefs.current[footerEditingTarget.index]?.focus();
+    }
+  }, [isDesignMode, footerEditingTarget]);
+
+
+
   return (
     <footer
       className="footer"
@@ -558,17 +602,76 @@ const showFooterInspector =
                 </a>
               </div>
 
-                <p
-                  style={{
-                    fontSize: "var(--footer-about-font-size-global-1, 14px)",
-                    color: "var(--footer-about-text-color-global-1, #666666)",
-                    lineHeight: "var(--footer-about-line-height-global-1, 24px)",
-                    marginBottom: "var(--footer-about-margin-bottom-global-1, 20px)",
-                  }}
-                >
-                  {footerOverlay?.props?.aboutText ??
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt cilisis."}
-                </p>
+               {isDesignMode &&
+                  footerEditingTarget?.componentKey === "footer" &&
+                  footerEditingTarget.field === "aboutText" ? (
+                    <textarea
+                      ref={(el) => {
+                        aboutTextRef.current = el;
+                        if (el && clickPositionRef.current !== null) {
+                          el.selectionStart = el.selectionEnd = clickPositionRef.current;
+                          clickPositionRef.current = null; // reset after applying
+                        }
+                      }}
+                      value={
+                        footerOverlay?.props?.aboutText ??
+                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt cilisis."
+                      }
+                      onChange={(e) => {
+                        updateFooterComponentProps("global", "footer", {
+                          aboutText: e.target.value,
+                        });
+                      }}
+                      onClick={(e) => {
+                        setClickedInsideInspector();
+                        e.stopPropagation();
+                      }}
+                      style={{
+                        width: "100%",
+                        fontSize: "var(--footer-about-font-size-global-1, 14px)",
+                        color: "var(--footer-about-text-color-global-1, #666666)",
+                        lineHeight: "var(--footer-about-line-height-global-1, 24px)",
+                        marginBottom: "var(--footer-about-margin-bottom-global-1, 20px)",
+                        background: "transparent",
+                        border: "none",
+                        outline: "none",
+                        resize: "none",
+                        whiteSpace: "pre-wrap",
+                      }}
+                    />
+                  ) : (
+                    <p
+                      onMouseDown={(e) => {
+                        if (isDesignMode) {
+                          // Get click offset in text
+                          const range = document.caretRangeFromPoint?.(e.clientX, e.clientY);
+                          if (range && range.startOffset !== undefined) {
+                            clickPositionRef.current = range.startOffset;
+                          }
+                        }
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (isDesignMode) {
+                          setFooterEditingTarget({
+                            route: "global",
+                            componentKey: "footer",
+                            field: "aboutText",
+                          });
+                        }
+                      }}
+                      style={{
+                        fontSize: "var(--footer-about-font-size-global-1, 14px)",
+                        color: "var(--footer-about-text-color-global-1, #666666)",
+                        lineHeight: "var(--footer-about-line-height-global-1, 24px)",
+                        marginBottom: "var(--footer-about-margin-bottom-global-1, 20px)",
+                        cursor: isDesignMode ? "text" : "default",
+                      }}
+                    >
+                      {footerOverlay?.props?.aboutText ??
+                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt cilisis."}
+                    </p>
+                  )}
 
 
                <div className="footer__payment">
@@ -609,34 +712,124 @@ const showFooterInspector =
           {/* Quick Links */}
           <div className="col-lg-2 col-md-3 col-sm-5">
             <div className="footer__widget">
-            <h6
-                style={{
-                  color: "var(--footer-heading-color-global-1, #111111)",
-                  fontWeight: "var(--footer-heading-font-weight-global-1, 600)",
-                  textTransform: "var(--footer-heading-text-transform-global-1, uppercase)",
-                  marginBottom: "var(--footer-heading-margin-bottom-global-1, 12px)",
-                  fontSize: "var(--footer-heading-font-size-global-1, 16px)",
-                }}
-              >
-                {footerOverlay?.props?.quickLinksTitle ?? "Quick links"}
-              </h6>
+            {isDesignMode &&
+              footerEditingTarget?.componentKey === "footer" &&
+              footerEditingTarget.field === "quickLinksTitle" ? (
+                <textarea
+                  ref={quickLinksTitleRef}
+                  value={footerOverlay?.props?.quickLinksTitle ?? "Quick links"}
+                  onChange={(e) => {
+                    updateFooterComponentProps("global", "footer", {
+                      quickLinksTitle: e.target.value,
+                    });
+                  }}
+                  onClick={(e) => {
+                    setClickedInsideInspector();
+                    e.stopPropagation();
+                  }}
+                  style={{
+                    width: "100%",
+                    color: "var(--footer-heading-color-global-1, #111111)",
+                    fontWeight: "var(--footer-heading-font-weight-global-1, 600)",
+                    textTransform: "var(--footer-heading-text-transform-global-1, uppercase)",
+                    marginBottom: "var(--footer-heading-margin-bottom-global-1, 12px)",
+                    fontSize: "var(--footer-heading-font-size-global-1, 16px)",
+                    background: "transparent",
+                    border: "none",
+                    outline: "none",
+                    resize: "none",
+                    whiteSpace: "pre-wrap",
+                  }}
+                />
+              ) : (
+                <h6
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (isDesignMode) {
+                      setFooterEditingTarget({
+                        route: "global",
+                        componentKey: "footer",
+                        field: "quickLinksTitle",
+                      });
+                    }
+                  }}
+                  style={{
+                    color: "var(--footer-heading-color-global-1, #111111)",
+                    fontWeight: "var(--footer-heading-font-weight-global-1, 600)",
+                    textTransform: "var(--footer-heading-text-transform-global-1, uppercase)",
+                    marginBottom: "var(--footer-heading-margin-bottom-global-1, 12px)",
+                    fontSize: "var(--footer-heading-font-size-global-1, 16px)",
+                    cursor: isDesignMode ? "text" : "default",
+                  }}
+                >
+                  {footerOverlay?.props?.quickLinksTitle ?? "Quick links"}
+                </h6>
+              )}
+
 
               <ul>
-                {(footerOverlay?.props?.quickLinks ?? ["About", "Blogs", "Contact", "FAQ"]).map((t, i) => (
-                  <li key={`${i}-${t}`}>
-                    <a
-                      href="#"
-                      style={{
-                        fontSize: "var(--footer-link-font-size-global-1, 14px)",
-                        color: "var(--footer-link-color-global-1, #666666)",
-                        lineHeight: "var(--footer-link-line-height-global-1, 30px)",
-                      }}
-                    >
-                      {t}
-                    </a>
-                  </li>
-                ))}
+                {quickLinksDraft.map((text, i) =>
+                  isDesignMode &&
+                  footerEditingTarget?.componentKey === "footer" &&
+                  footerEditingTarget.field === "quickLinks" &&
+                  footerEditingTarget.index === i ? (
+                    <li key={`ql-${i}`}>
+                      <textarea
+                        ref={(el) => (quickLinksRefs.current[i] = el)}
+                        value={text}
+                        onChange={(e) => {
+                          const next = [...quickLinksDraft];
+                          next[i] = e.target.value;
+                          setQuickLinksDraft(next);     // instant local update
+                          commitQuickLinks(next);       // debounced store update
+                        }}
+                        onClick={(e) => {
+                          setClickedInsideInspector();
+                          e.stopPropagation();
+                        }}
+                        style={{
+                          width: "100%",
+                          fontSize: "var(--footer-link-font-size-global-1, 14px)",
+                          color: "var(--footer-link-color-global-1, #666666)",
+                          lineHeight: "var(--footer-link-line-height-global-1, 30px)",
+                          background: "transparent",
+                          border: "none",
+                          outline: "none",
+                          resize: "none",
+                          whiteSpace: "pre-wrap",
+                        }}
+                      />
+                    </li>
+                  ) : (
+                    <li key={`ql-${i}`}>
+                      <a
+                        href="#"
+                        onClick={(e) => {
+                          if (isDesignMode) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setFooterEditingTarget({
+                              route: "global",
+                              componentKey: "footer",
+                              field: "quickLinks",
+                              index: i,
+                            });
+                          }
+                        }}
+                        style={{
+                          fontSize: "var(--footer-link-font-size-global-1, 14px)",
+                          color: "var(--footer-link-color-global-1, #666666)",
+                          lineHeight: "var(--footer-link-line-height-global-1, 30px)",
+                          cursor: isDesignMode ? "text" : "pointer",
+                        }}
+                      >
+                        {quickLinksFromStore[i] ?? DEFAULT_QUICK_LINKS[i]}
+                      </a>
+                    </li>
+                  )
+                )}
               </ul>
+
 
             </div>
           </div>
@@ -644,80 +837,123 @@ const showFooterInspector =
           {/* Account */}
           <div className="col-lg-2 col-md-3 col-sm-4">
             <div className="footer__widget">
-              <h6
-                style={{
-                  color: "var(--footer-heading-color-global-1, #111111)",
-                  fontWeight: "var(--footer-heading-font-weight-global-1, 600)",
-                  textTransform: "var(--footer-heading-text-transform-global-1, uppercase)",
-                  marginBottom: "var(--footer-heading-margin-bottom-global-1, 12px)",
-                  fontSize: "var(--footer-heading-font-size-global-1, 16px)",
-                }}
-              >
-                {footerOverlay?.props?.accountTitle ?? "ACCOUNT"}
-              </h6>
+              {isDesignMode &&
+                footerEditingTarget?.componentKey === "footer" &&
+                footerEditingTarget.field === "accountTitle" ? (
+                  <textarea
+                    ref={accountTitleRef}
+                    value={footerOverlay?.props?.accountTitle ?? "ACCOUNT"}
+                    onChange={(e) => {
+                      updateFooterComponentProps("global", "footer", {
+                        accountTitle: e.target.value,
+                      });
+                    }}
+                    onClick={(e) => {
+                      setClickedInsideInspector();
+                      e.stopPropagation();
+                    }}
+                    style={{
+                      width: "100%",
+                      color: "var(--footer-heading-color-global-1, #111111)",
+                      fontWeight: "var(--footer-heading-font-weight-global-1, 600)",
+                      textTransform: "var(--footer-heading-text-transform-global-1, uppercase)",
+                      marginBottom: "var(--footer-heading-margin-bottom-global-1, 12px)",
+                      fontSize: "var(--footer-heading-font-size-global-1, 16px)",
+                      background: "transparent",
+                      border: "none",
+                      outline: "none",
+                      resize: "none",
+                      whiteSpace: "pre-wrap",
+                    }}
+                  />
+                ) : (
+                  <h6
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (isDesignMode) {
+                        setFooterEditingTarget({
+                          route: "global",
+                          componentKey: "footer",
+                          field: "accountTitle",
+                        });
+                      }
+                    }}
+                    style={{
+                      color: "var(--footer-heading-color-global-1, #111111)",
+                      fontWeight: "var(--footer-heading-font-weight-global-1, 600)",
+                      textTransform: "var(--footer-heading-text-transform-global-1, uppercase)",
+                      marginBottom: "var(--footer-heading-margin-bottom-global-1, 12px)",
+                      fontSize: "var(--footer-heading-font-size-global-1, 16px)",
+                      cursor: isDesignMode ? "text" : "default",
+                    }}
+                  >
+                    {footerOverlay?.props?.accountTitle ?? "ACCOUNT"}
+                  </h6>
+                )}
 
-<ul>
-  {accountLinksDraft.map((text, i) =>
-    isDesignMode &&
-    footerEditingTarget?.componentKey === "footer" &&
-    footerEditingTarget.field === "accountLinks" &&
-    footerEditingTarget.index === i ? (
-      <li key={`acc-${i}`}>
-        <textarea
-          ref={(el) => (accountLinksRefs.current[i] = el)}
-          value={text}
-          onChange={(e) => {
-            const next = [...accountLinksDraft];
-            next[i] = e.target.value;
-            setAccountLinksDraft(next);          // local, instant
-            commitAccountLinks(next);            // debounced global update
-          }}
-          onClick={(e) => {
-            setClickedInsideInspector();
-            e.stopPropagation();
-          }}
-          style={{
-            width: "100%",
-            fontSize: "var(--footer-link-font-size-global-1, 14px)",
-            color: "var(--footer-link-color-global-1, #666666)",
-            lineHeight: "var(--footer-link-line-height-global-1, 30px)",
-            background: "transparent",
-            border: "none",
-            outline: "none",
-            resize: "none",
-            whiteSpace: "pre-wrap",
-          }}
-        />
-      </li>
-    ) : (
-      <li key={`acc-${i}`}>
-        <a
-          href="#"
-          onClick={(e) => {
-            if (isDesignMode) {
-              e.preventDefault();
-              e.stopPropagation();
-              setFooterEditingTarget({
-                route: "global",
-                componentKey: "footer",
-                field: "accountLinks",
-                index: i,
-              });
-            }
-          }}
-          style={{
-            fontSize: "var(--footer-link-font-size-global-1, 14px)",
-            color: "var(--footer-link-color-global-1, #666666)",
-            lineHeight: "var(--footer-link-line-height-global-1, 30px)",
-            cursor: isDesignMode ? "text" : "pointer",
-          }}
-        >
-          {accountLinksFromStore[i] ?? DEFAULT_ACCOUNT_LINKS[i]}
-        </a>
-      </li>
-    )
-  )}
-</ul>
+
+                <ul>
+                  {accountLinksDraft.map((text, i) =>
+                    isDesignMode &&
+                    footerEditingTarget?.componentKey === "footer" &&
+                    footerEditingTarget.field === "accountLinks" &&
+                    footerEditingTarget.index === i ? (
+                      <li key={`acc-${i}`}>
+                        <textarea
+                          ref={(el) => (accountLinksRefs.current[i] = el)}
+                          value={text}
+                          onChange={(e) => {
+                            const next = [...accountLinksDraft];
+                            next[i] = e.target.value;
+                            setAccountLinksDraft(next);          // local, instant
+                            commitAccountLinks(next);            // debounced global update
+                          }}
+                          onClick={(e) => {
+                            setClickedInsideInspector();
+                            e.stopPropagation();
+                          }}
+                          style={{
+                            width: "100%",
+                            fontSize: "var(--footer-link-font-size-global-1, 14px)",
+                            color: "var(--footer-link-color-global-1, #666666)",
+                            lineHeight: "var(--footer-link-line-height-global-1, 30px)",
+                            background: "transparent",
+                            border: "none",
+                            outline: "none",
+                            resize: "none",
+                            whiteSpace: "pre-wrap",
+                          }}
+                        />
+                      </li>
+                    ) : (
+                      <li key={`acc-${i}`}>
+                        <a
+                          href="#"
+                          onClick={(e) => {
+                            if (isDesignMode) {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setFooterEditingTarget({
+                                route: "global",
+                                componentKey: "footer",
+                                field: "accountLinks",
+                                index: i,
+                              });
+                            }
+                          }}
+                          style={{
+                            fontSize: "var(--footer-link-font-size-global-1, 14px)",
+                            color: "var(--footer-link-color-global-1, #666666)",
+                            lineHeight: "var(--footer-link-line-height-global-1, 30px)",
+                            cursor: isDesignMode ? "text" : "pointer",
+                          }}
+                        >
+                          {accountLinksFromStore[i] ?? DEFAULT_ACCOUNT_LINKS[i]}
+                        </a>
+                      </li>
+                    )
+                  )}
+                </ul>
 
 
             </div>
