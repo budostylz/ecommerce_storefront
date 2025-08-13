@@ -212,7 +212,7 @@ const tokensForFooter = useMemo(() => {
         break;
       case "accountLinks":
         if (typeof footerEditingTarget.index === "number") {
-          accountLinksRef.current[footerEditingTarget.index]?.focus();
+          accountLinksRefs.current[footerEditingTarget.index]?.focus();
         }
         break;
       case "newsletterTitle":
@@ -484,6 +484,48 @@ const showFooterInspector =
   console.log('footerOverlay?.props?.socialLinks: ', footerOverlay?.props?.socialLinks);
 
 
+
+  //////////////////////
+
+  // 1) stable default once
+    const DEFAULT_ACCOUNT_LINKS = useMemo(
+      () => ["My Account", "Orders Tracking", "Checkout", "Wishlist"],
+      []
+    );
+
+    // 2) local draft for snappy typing
+    const accountLinksFromStore =
+      footerOverlay?.props?.accountLinks ?? DEFAULT_ACCOUNT_LINKS;
+
+    const [accountLinksDraft, setAccountLinksDraft] = React.useState(accountLinksFromStore);
+
+    // keep draft in sync when opening editor or store changes externally
+    useEffect(() => {
+      setAccountLinksDraft(accountLinksFromStore);
+    }, [accountLinksFromStore, footerEditingTarget]);
+
+    // 3) tiny debounce so we don’t slam the store on each key
+    const debouncedCommitRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const commitAccountLinks = (next: string[]) => {
+      if (debouncedCommitRef.current) clearTimeout(debouncedCommitRef.current);
+      debouncedCommitRef.current = setTimeout(() => {
+        updateFooterComponentProps("global", "footer", { accountLinks: next });
+      }, 150);
+    };
+
+
+    useEffect(() => {
+      if (
+        isDesignMode &&
+        footerEditingTarget?.componentKey === "footer" &&
+        footerEditingTarget.field === "accountLinks" &&
+        typeof footerEditingTarget.index === "number"
+      ) {
+        accountLinksRefs.current[footerEditingTarget.index]?.focus();
+      }
+    }, [isDesignMode, footerEditingTarget]);
+
+
   return (
     <footer
       className="footer"
@@ -614,27 +656,69 @@ const showFooterInspector =
                 {footerOverlay?.props?.accountTitle ?? "ACCOUNT"}
               </h6>
 
-             <ul>
-              {(footerOverlay?.props?.accountLinks ?? [
-                "My Account",
-                "Orders Tracking",
-                "Checkout",
-                "Wishlist",
-              ]).map((t: string) => (
-                <li key={t}>
-                  <a
-                    href="#"
-                    style={{
-                      fontSize: "var(--footer-link-font-size-global-1, 14px)",
-                      color: "var(--footer-link-color-global-1, #666666)",
-                      lineHeight: "var(--footer-link-line-height-global-1, 30px)",
-                    }}
-                  >
-                    {t}
-                  </a>
-                </li>
-              ))}
-            </ul>
+<ul>
+  {accountLinksDraft.map((text, i) =>
+    isDesignMode &&
+    footerEditingTarget?.componentKey === "footer" &&
+    footerEditingTarget.field === "accountLinks" &&
+    footerEditingTarget.index === i ? (
+      <li key={`acc-${i}`}>
+        <textarea
+          ref={(el) => (accountLinksRefs.current[i] = el)}
+          value={text}
+          onChange={(e) => {
+            const next = [...accountLinksDraft];
+            next[i] = e.target.value;
+            setAccountLinksDraft(next);          // local, instant
+            commitAccountLinks(next);            // debounced global update
+          }}
+          onClick={(e) => {
+            setClickedInsideInspector();
+            e.stopPropagation();
+          }}
+          style={{
+            width: "100%",
+            fontSize: "var(--footer-link-font-size-global-1, 14px)",
+            color: "var(--footer-link-color-global-1, #666666)",
+            lineHeight: "var(--footer-link-line-height-global-1, 30px)",
+            background: "transparent",
+            border: "none",
+            outline: "none",
+            resize: "none",
+            whiteSpace: "pre-wrap",
+          }}
+        />
+      </li>
+    ) : (
+      <li key={`acc-${i}`}>
+        <a
+          href="#"
+          onClick={(e) => {
+            if (isDesignMode) {
+              e.preventDefault();
+              e.stopPropagation();
+              setFooterEditingTarget({
+                route: "global",
+                componentKey: "footer",
+                field: "accountLinks",
+                index: i,
+              });
+            }
+          }}
+          style={{
+            fontSize: "var(--footer-link-font-size-global-1, 14px)",
+            color: "var(--footer-link-color-global-1, #666666)",
+            lineHeight: "var(--footer-link-line-height-global-1, 30px)",
+            cursor: isDesignMode ? "text" : "pointer",
+          }}
+        >
+          {accountLinksFromStore[i] ?? DEFAULT_ACCOUNT_LINKS[i]}
+        </a>
+      </li>
+    )
+  )}
+</ul>
+
 
             </div>
           </div>
