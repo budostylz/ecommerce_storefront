@@ -642,17 +642,60 @@ const showFooterInspector =
           {/* Newsletter */}
           <div className="col-lg-4 col-md-8 col-sm-8">
             <div className="footer__newslatter">
-             <h6
-                style={{
-                  color: "var(--footer-heading-color-global-1, #111111)",
-                  fontWeight: "var(--footer-heading-font-weight-global-1, 600)",
-                  textTransform: "var(--footer-heading-text-transform-global-1, uppercase)",
-                  marginBottom: "var(--footer-newsletter-heading-margin-bottom-global-1, 25px)",
-                  fontSize: "var(--footer-heading-font-size-global-1, 16px)",
-                }}
-              >
-                {footerOverlay?.props?.newsletterTitle ?? "NEWSLETTER"}
-              </h6>
+            {isDesignMode &&
+              footerEditingTarget?.componentKey === "footer" &&
+              footerEditingTarget.field === "newsletterTitle" ? (
+                <textarea
+                  ref={newsletterTitleRef}
+                  value={footerOverlay?.props?.newsletterTitle ?? "NEWSLETTER"}
+                  onChange={(e) => {
+                    updateFooterComponentProps("global", "footer", {
+                      newsletterTitle: e.target.value,
+                    });
+                  }}
+                  onClick={(e) => {
+                    setClickedInsideInspector();
+                    e.stopPropagation();
+                  }}
+                  style={{
+                    width: "100%",
+                    color: "var(--footer-heading-color-global-1, #111111)",
+                    fontWeight: "var(--footer-heading-font-weight-global-1, 600)",
+                    textTransform: "var(--footer-heading-text-transform-global-1, uppercase)",
+                    marginBottom: "var(--footer-newsletter-heading-margin-bottom-global-1, 25px)",
+                    fontSize: "var(--footer-heading-font-size-global-1, 16px)",
+                    background: "transparent",
+                    border: "none",
+                    outline: "none",
+                    resize: "none",
+                    whiteSpace: "pre-wrap",
+                  }}
+                />
+              ) : (
+                <h6
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (isDesignMode) {
+                      setFooterEditingTarget({
+                        route: "global",
+                        componentKey: "footer",
+                        field: "newsletterTitle",
+                      });
+                    }
+                  }}
+                  style={{
+                    color: "var(--footer-heading-color-global-1, #111111)",
+                    fontWeight: "var(--footer-heading-font-weight-global-1, 600)",
+                    textTransform: "var(--footer-heading-text-transform-global-1, uppercase)",
+                    marginBottom: "var(--footer-newsletter-heading-margin-bottom-global-1, 25px)",
+                    fontSize: "var(--footer-heading-font-size-global-1, 16px)",
+                    cursor: isDesignMode ? "text" : "default",
+                  }}
+                >
+                  {footerOverlay?.props?.newsletterTitle ?? "NEWSLETTER"}
+                </h6>
+              )}
+
 
               <form action="#" style={{ position: "relative", marginBottom: "var(--footer-newsletter-form-margin-bottom-global-1, 30px)" }}>
                 <input
@@ -670,25 +713,71 @@ const showFooterInspector =
                     background: "var(--footer-input-bg-global-1, #fff)",
                   }}
                 />
-                <div
-                  type="submit"
-                  className="site-btn"
-                  // let `.site-btn` do the heavy lifting; tokens are optional overrides
-                  style={{
-                    background: "var(--footer-button-bg-global-1, #ca1515)",
-                    color: "var(--footer-button-text-color-global-1, #ffffff)",
-                    fontSize: "var(--footer-button-font-size-global-1, 14px)",
-                    fontWeight: "var(--footer-button-font-weight-global-1, 600)",
-                    textTransform: "var(--footer-button-text-transform-global-1, uppercase)",
-                    padding: "var(--footer-button-padding-y-global-1, 12px) var(--footer-button-padding-x-global-1, 30px)",
-                    borderRadius: "var(--footer-button-border-radius-global-1, 50px)",
-                    position: "var(--footer-button-position-global-1, absolute)",
-                    right: "var(--footer-button-right-global-1, 4px)",
-                    top: "var(--footer-button-top-global-1, 4px)",
-                  }}
-                >
-                  {footerOverlay?.props?.newsletterButton ?? "Subscribe"}
-                </div>
+                {isDesignMode &&
+                    footerEditingTarget?.componentKey === "footer" &&
+                    footerEditingTarget.field === "newsletterButton" ? (
+                      <textarea
+                        ref={newsletterButtonRef}
+                        value={footerOverlay?.props?.newsletterButton ?? "Subscribe"}
+                        onChange={(e) => {
+                          updateFooterComponentProps("global", "footer", { newsletterButton: e.target.value });
+                        }}
+                        onClick={(e) => {
+                          setClickedInsideInspector();
+                          e.stopPropagation();
+                        }}
+                        style={{
+                          width: "100%",
+                          fontSize: "var(--footer-button-font-size-global-1)",
+                          textTransform: "var(--footer-button-text-transform-global-1)",
+                          fontWeight: "var(--footer-button-font-weight-global-1)",
+                          color: "var(--footer-button-text-color-global-1)",
+                          background: "var(--footer-button-bg-global-1)",
+                          padding:
+                            "var(--footer-button-padding-y-global-1) var(--footer-button-padding-x-global-1)",
+                          borderRadius: "var(--footer-button-border-radius-global-1)",
+                          border: "none",
+                          outline: "none",
+                          resize: "none",
+                          whiteSpace: "pre-wrap",
+                          textAlign: "center",
+                        }}
+                      />
+                  ) : (
+                      <div
+                        type="submit"
+                        className="site-btn"
+                        onClick={(e) => {
+                          if (isDesignMode) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setFooterEditingTarget({
+                              route: "global",
+                              componentKey: "footer",
+                              field: "newsletterButton",
+                            });
+                          }
+                        }}
+                        style={{
+                          background: "var(--footer-button-bg-global-1, #ca1515)",
+                          color: "var(--footer-button-text-color-global-1, #ffffff)",
+                          fontSize: "var(--footer-button-font-size-global-1, 14px)",
+                          fontWeight: "var(--footer-button-font-weight-global-1, 600)",
+                          textTransform: "var(--footer-button-text-transform-global-1, uppercase)",
+                          padding:
+                            "var(--footer-button-padding-y-global-1, 12px) var(--footer-button-padding-x-global-1, 30px)",
+                          borderRadius: "var(--footer-button-border-radius-global-1, 50px)",
+                          position: "var(--footer-button-position-global-1, absolute)",
+                          right: "var(--footer-button-right-global-1, 4px)",
+                          top: "var(--footer-button-top-global-1, 4px)",
+                          cursor: isDesignMode ? "text" : "pointer",
+                          textAlign: "center",
+                        }}
+                      >
+                        {footerOverlay?.props?.newsletterButton ?? "Subscribe"}
+                      </div>
+                  )}
+
 
               </form>
 
