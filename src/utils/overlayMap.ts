@@ -1,12 +1,15 @@
 // e.g. src/utils/overlayMap.ts (excerpt)
 export const overlayMap = {
   global: {
-    "footer": {
+    footer: {
       component: "footer",
       props: {
+        logo: "https://storage.googleapis.com/budoapps-5aacf.firebasestorage.app/templates/ecommerce/fashio/logo.png",
         aboutText:
           "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt cilisis.",
+        quickLinksTitle: "QUICK LINKS",
         quickLinks: ["About", "Blogs", "Contact", "FAQ"],
+        accountTitle: "ACCOUNT",
         accountLinks: ["My Account", "Orders Tracking", "Checkout", "Wishlist"],
         newsletterTitle: "NEWSLETTER",
         newsletterPlaceholder: "Email",
@@ -18,7 +21,14 @@ export const overlayMap = {
           { icon: "fa fa-instagram", href: "#" },
           { icon: "fa fa-pinterest", href: "#" }
         ],
-        copyrightText: `© ${new Date().getFullYear()} Crafted with passion <i class="fa fa-heart" aria-hidden="true"></i> on <a href="https://budoboost.com" target="_blank" rel="noopener noreferrer">BudoBoost</a> — Empowering creators to launch beautiful sites in minutes.`
+        paymentIcons: [
+          { src: "/origin/base/web/img/payment/payment-1.png", alt: "Payment 1" },
+          { src: "/origin/base/web/img/payment/payment-2.png", alt: "Payment 2" },
+          { src: "/origin/base/web/img/payment/payment-3.png", alt: "Payment 3" },
+          { src: "/origin/base/web/img/payment/payment-4.png", alt: "Payment 4" },
+          { src: "/origin/base/web/img/payment/payment-5.png", alt: "Payment 5" }
+        ],
+        copyrightText: `© ${new Date().getFullYear()} Crafted with passion 🚀 on <a href="https://budoboost.com" target="_blank" rel="noopener noreferrer">BudoBoost</a> — Empowering creators to launch beautiful sites in minutes.`
       },
       tokens: [
         "--footer-section-bg-global-0",

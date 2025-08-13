@@ -23,12 +23,12 @@ const Contact: React.FC<ContactProps> = (props) => {
   // This component’s overlay node
   const overlay = overlayState?.["/contact"]?.contact;
 
-  console.log('overlayState: ', overlayState);
+  /*console.log('overlayState: ', overlayState);
   console.log('tokensBag: ', tokensBag);
   console.log('updateDesignToken: ', updateDesignToken);
   console.log('editingTarget: ', editingTarget);
   console.log('setEditingTarget: ', setEditingTarget);
-  console.log('overlay: ', overlay);
+  console.log('overlay: ', overlay);*/
 
   // Refs for editable text fields
   const sectionRef = useRef<HTMLElement | null>(null);                   // Parent Ref
@@ -50,6 +50,7 @@ const Contact: React.FC<ContactProps> = (props) => {
 
   // Device detection
   const [isMobileOrTablet, setIsMobileOrTablet] = useState(false);
+  //console.log('isDesignMode: ', isDesignMode);
 
 
 
@@ -76,14 +77,13 @@ const Contact: React.FC<ContactProps> = (props) => {
 
   const [form, setForm] = useState({ name: "", email: "", website: "", message: "" });
 
-  console.log('isDesignMode: ', isDesignMode);
 
   // Only apply the tokens that this overlay cares about (values from designTokens)
   const tokensForContact = useMemo(() => {
     const keys = overlay?.tokens ?? [];
-    console.log('keys: ', keys);
+    //console.log('keys: ', keys);
     const subset: Record<string, string> = {};
-     console.log('subset: ', subset);
+     //console.log('subset: ', subset);
     keys.forEach((k: string) => {
       if (k in designTokens) subset[k] = (designTokens as any)[k];
     });
@@ -111,7 +111,7 @@ const Contact: React.FC<ContactProps> = (props) => {
 
   useEffect(() => {
 
-  console.log('editingTarget CHECK: ', editingTarget);
+  //console.log('editingTarget CHECK: ', editingTarget);
   if (editingTarget?.componentKey === "contact") {
     switch (editingTarget.field) {
       case "contactInfo":
@@ -238,7 +238,7 @@ const handleStyleChange = (updates: StyleUpdates) => {
 
   const { field } = editingTarget;
 
-  console.log('Checking Field: ', field);
+  //console.log('Checking Field: ', field);
 
   // Helpers
   const setToken = (token: string, val: string) => {

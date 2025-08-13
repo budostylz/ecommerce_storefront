@@ -1,8 +1,167 @@
 // src/components/Footer.tsx
-import React from "react";
+import React, { useEffect, useRef, useMemo, useState } from "react";
+import { usePreviewStore } from "src/store/previewStore";
+import { designTokens, applyDesignTokens } from "@/utils/designTokens";
+import { overlayMap } from "@/utils/overlayMap";
+import toast from "react-hot-toast";
+import { setClickedInsideInspector } from "src/utils/inspectorClickGuard";
+import { normalizeValue } from "src/utils/normalizeValue";
+import FloatingStyleInspector from "@components/FloatingStyleInspector";
 
-const Footer: React.FC = () => {
+
+const Footer: React.FC<Footerrops> = (props) => {
   const currentYear = new Date().getFullYear();
+
+  // Zustand state
+  const overlayState = usePreviewStore((s) => s.overlayMap);
+  const tokensBag = usePreviewStore((s) => s.designTokens);
+
+  const updateComponentProps = usePreviewStore((s) => s.updateComponentProps);
+  const updateDesignToken = usePreviewStore((s) => s.updateDesignToken);
+
+  const editingTarget = usePreviewStore((s) => s.editingTarget);
+  const setEditingTarget = usePreviewStore((s) => s.setEditingTarget);
+
+  // This component’s overlay node
+  const overlay = overlayState?.["global"]?.footer;
+
+  console.log('overlayState-footer: ', overlayState);
+  console.log('tokensBag-footer: ', tokensBag);
+  console.log('updateDesignToken-footer: ', updateDesignToken);
+  console.log('editingTarget-footer: ', editingTarget);
+  console.log('setEditingTarget-footer: ', setEditingTarget);
+  console.log('overlay-footer: ', overlay);
+
+  // Refs for editable text fields in Footer
+const footerSectionRef = useRef<HTMLElement | null>(null);            // Parent Ref (Footer wrapper)
+const logoRef = useRef<HTMLInputElement | null>(null);                 // Logo image URL
+const aboutTextRef = useRef<HTMLTextAreaElement | null>(null);         // About text
+
+// Quick Links
+const quickLinksTitleRef = useRef<HTMLTextAreaElement | null>(null);   // "QUICK LINKS" title
+const quickLinksRefs = useRef<Array<HTMLTextAreaElement | null>>([]);  // Quick links array items
+
+// Account Links
+const accountTitleRef = useRef<HTMLTextAreaElement | null>(null);      // "ACCOUNT" title
+const accountLinksRefs = useRef<Array<HTMLTextAreaElement | null>>([]);// Account links array items
+
+// Newsletter
+const newsletterTitleRef = useRef<HTMLTextAreaElement | null>(null);   // "NEWSLETTER" title
+const newsletterPlaceholderRef = useRef<HTMLInputElement | null>(null); // Email placeholder
+const newsletterButtonRef = useRef<HTMLTextAreaElement | null>(null);  // Subscribe button text
+
+// Social Links
+const socialLinksRefs = useRef<Array<HTMLTextAreaElement | null>>([]); // Social links array items
+
+// Payment Buttons
+const paymentButtonsRefs = useRef<Array<HTMLInputElement | null>>([]); // Payment button image URLs
+
+// Copyright
+const copyrightTextRef = useRef<HTMLTextAreaElement | null>(null);     // Copyright text
+
+// Device detection
+const [isMobileOrTablet, setIsMobileOrTablet] = useState(false);
+
+
+  // Merge overlay props (if any) with incoming props; incoming wins
+  const {
+    logo,
+    aboutText,
+    quickLinksTitle,
+    quickLinks,
+    accountTitle,
+    accountLinks,
+    newsletterTitle,
+    newsletterPlaceholder,
+    newsletterButton,
+    socialLinks,
+    paymentButtons,
+    copyrightText,
+    onSubscribe,
+    isDesignMode,
+  } = {
+    logo:
+      props.logo ??
+      overlay?.props?.logo ??
+      "https://storage.googleapis.com/budoapps-5aacf.firebasestorage.app/templates/ecommerce/fashio/logo.png",
+
+    aboutText:
+      props.aboutText ??
+      overlay?.props?.aboutText ??
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt cilisis.",
+
+    quickLinksTitle:
+      props.quickLinksTitle ??
+      overlay?.props?.quickLinksTitle ??
+      "QUICK LINKS",
+
+    quickLinks:
+      props.quickLinks ??
+      overlay?.props?.quickLinks ??
+      ["About", "Blogs", "Contact", "FAQ"],
+
+    accountTitle:
+      props.accountTitle ??
+      overlay?.props?.accountTitle ??
+      "ACCOUNT",
+
+    accountLinks:
+      props.accountLinks ??
+      overlay?.props?.accountLinks ??
+      ["My Account", "Orders Tracking", "Checkout", "Wishlist"],
+
+    newsletterTitle:
+      props.newsletterTitle ??
+      overlay?.props?.newsletterTitle ??
+      "NEWSLETTER",
+
+    newsletterPlaceholder:
+      props.newsletterPlaceholder ??
+      overlay?.props?.newsletterPlaceholder ??
+      "Email",
+
+    newsletterButton:
+      props.newsletterButton ??
+      overlay?.props?.newsletterButton ??
+      "Subscribe",
+
+    socialLinks:
+      props.socialLinks ??
+      overlay?.props?.socialLinks ?? [
+        { icon: "fa fa-facebook", href: "#" },
+        { icon: "fa fa-twitter", href: "#" },
+        { icon: "fa fa-youtube-play", href: "#" },
+        { icon: "fa fa-instagram", href: "#" },
+        { icon: "fa fa-pinterest", href: "#" },
+      ],
+
+    // list of image srcs for the payment badges
+    paymentButtons:
+      props.paymentButtons ??
+      overlay?.props?.paymentButtons ?? [
+        "/origin/base/web/img/payment/payment-1.png",
+        "/origin/base/web/img/payment/payment-2.png",
+        "/origin/base/web/img/payment/payment-3.png",
+        "/origin/base/web/img/payment/payment-4.png",
+        "/origin/base/web/img/payment/payment-5.png",
+      ],
+
+    copyrightText:
+      props.copyrightText ??
+      overlay?.props?.copyrightText ??
+      `© ${new Date().getFullYear()} Crafted with passion <span aria-hidden="true">⚡️</span> on <a href="https://budoboost.com" target="_blank" rel="noopener noreferrer">BudoBoost</a> — Empowering creators to launch beautiful sites in minutes.`,
+
+    onSubscribe: props.onSubscribe, // optional handler for newsletter submit
+    isDesignMode: props.isDesignMode ?? true,
+  } as const;
+    
+  console.log('isDesignMode: ', isDesignMode);
+
+
+  
+
+
+
 
   return (
     <footer

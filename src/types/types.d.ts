@@ -43,6 +43,23 @@ type ContactProps = {
   onSubmit?: (data: { name: string; email: string; website: string; message: string }) => void;
 };
 
+type FooterProps = {
+  logo?: string;
+  aboutText?: string;
+  quickLinksTitle?: string;
+  quickLinks?: string[];
+  accountTitle?: string;
+  accountLinks?: string[];
+  newsletterTitle?: string;
+  newsletterPlaceholder?: string;
+  newsletterButton?: string;
+  socialLinks?: { icon: string; href: string }[];
+  paymentButtons?: string[]; // list of image srcs for payment badges
+  copyrightText?: string;
+  isDesignMode?: boolean;
+  page?: string;
+  onSubscribe?: (email: string) => void;
+};
 
 
 
