@@ -7,11 +7,11 @@ export const overlayMap = {
         logo: "https://storage.googleapis.com/budoapps-5aacf.firebasestorage.app/templates/ecommerce/fashio/logo.png",
         aboutText:
           "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt cilisis.",
-        quickLinksTitle: "QUICK LINKS",
+        quickLinksTitle: "Quick Links",
         quickLinks: ["About", "Blogs", "Contact", "FAQ"],
-        accountTitle: "ACCOUNT",
+        accountTitle: "Account",
         accountLinks: ["My Account", "Orders Tracking", "Checkout", "Wishlist"],
-        newsletterTitle: "NEWSLETTER",
+        newsletterTitle: "Newsletter",
         newsletterPlaceholder: "Email",
         newsletterButton: "Subscribe",
         socialLinks: [

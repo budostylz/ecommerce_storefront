@@ -442,6 +442,46 @@ const handleStyleChange = (updates: StyleUpdates) => {
   }
 };
 
+// Token helper (footer/global)
+const getFooterToken = (key: string, index?: number) => {
+  const suffix = index !== undefined ? `global-${index}` : "global-1";
+  return `--footer-${key}-${suffix}`;
+};
+
+// Which fields can open the style/content inspector for Footer
+const footerAllowedFields = [
+  "section",            // whole footer container
+  "logo",
+  "aboutText",
+  "quickLinksTitle",
+  "quickLinks",
+  "accountTitle",
+  "accountLinks",
+  "newsletterTitle",
+  "newsletterInput",
+  "newsletterButton",
+  "socialLinks",
+  "paymentButtons",
+  "copyrightText",
+] as const;
+
+// Show inspector when in design mode and a valid footer field is targeted
+const showFooterInspector =
+  isDesignMode &&
+  footerEditingTarget?.componentKey === "footer" &&
+  footerAllowedFields.includes(footerEditingTarget.field as typeof footerAllowedFields[number]);
+
+  console.log('footerOverlay?.props: ', footerOverlay?.props);
+  console.log('footerOverlay?.props?.logo: ', footerOverlay?.props?.logo);
+  console.log('footerOverlay?.props?.aboutText: ', footerOverlay?.props?.aboutText);
+  console.log('footerOverlay?.props?.paymentIcons: ', footerOverlay?.props?.paymentIcons);
+  console.log('footerOverlay?.props?.quickLinksTitle: ', footerOverlay?.props?.quickLinksTitle);
+  console.log('footerOverlay?.props?.quickLinks: ', footerOverlay?.props?.quickLinks);
+  console.log('footerOverlay?.props?.accountTitle: ', footerOverlay?.props?.accountTitle);
+  console.log('footerOverlay?.props?.accountLinks: ', footerOverlay?.props?.accountLinks);
+  console.log('footerOverlay?.props?.newsletterTitle: ', footerOverlay?.props?.newsletterTitle);
+  console.log('footerOverlay?.props?.newsletterButton: ', footerOverlay?.props?.newsletterButton);
+  console.log('footerOverlay?.props?.socialLinks: ', footerOverlay?.props?.socialLinks);
 
 
   return (
@@ -461,12 +501,12 @@ const handleStyleChange = (updates: StyleUpdates) => {
           <div className="col-lg-4 col-md-6 col-sm-7">
             <div className="footer__about">
               <div className="footer__logo">
-                <a href="/">
+               <a href="/">
                   <img
-                    src="https://storage.googleapis.com/budoapps-5aacf.firebasestorage.app/templates/ecommerce/fashio/logo.png"
+                    src={footerOverlay?.props?.logo ?? "https://storage.googleapis.com/budoapps-5aacf.firebasestorage.app/templates/ecommerce/fashio/logo.png"}
                     alt="Logo"
                     style={{
-                      // keep original look; token can shrink/grow if you set it
+                      // keep original look; allow token-driven tweaks
                       maxWidth: "var(--footer-logo-max-width-global-1, 150px)",
                       height: "auto",
                       display: "block",
@@ -476,22 +516,30 @@ const handleStyleChange = (updates: StyleUpdates) => {
                 </a>
               </div>
 
-              <p
-                style={{
-                  fontSize: "var(--footer-about-font-size-global-1, 14px)",
-                  color: "var(--footer-about-text-color-global-1, #666666)",
-                  lineHeight: "var(--footer-about-line-height-global-1, 24px)",
-                  marginBottom: "var(--footer-about-margin-bottom-global-1, 20px)",
-                }}
-              >
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt cilisis.
-              </p>
+                <p
+                  style={{
+                    fontSize: "var(--footer-about-font-size-global-1, 14px)",
+                    color: "var(--footer-about-text-color-global-1, #666666)",
+                    lineHeight: "var(--footer-about-line-height-global-1, 24px)",
+                    marginBottom: "var(--footer-about-margin-bottom-global-1, 20px)",
+                  }}
+                >
+                  {footerOverlay?.props?.aboutText ??
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt cilisis."}
+                </p>
 
-              <div className="footer__payment">
-                {[1, 2, 3, 4, 5].map((num) => (
+
+               <div className="footer__payment">
+                {(footerOverlay?.props?.paymentIcons ?? [
+                  { src: "/origin/base/web/img/payment/payment-1.png", alt: "Payment 1" },
+                  { src: "/origin/base/web/img/payment/payment-2.png", alt: "Payment 2" },
+                  { src: "/origin/base/web/img/payment/payment-3.png", alt: "Payment 3" },
+                  { src: "/origin/base/web/img/payment/payment-4.png", alt: "Payment 4" },
+                  { src: "/origin/base/web/img/payment/payment-5.png", alt: "Payment 5" },
+                ]).map((icon, index) => (
                   <a
                     href="#"
-                    key={num}
+                    key={index}
                     style={{
                       marginRight: "var(--footer-payment-gap-global-1, 6px)",
                       marginBottom: "var(--footer-payment-gap-global-1, 10px)",
@@ -499,20 +547,27 @@ const handleStyleChange = (updates: StyleUpdates) => {
                     }}
                   >
                     <img
-                      src={`/origin/base/web/img/payment/payment-${num}.png`}
-                      alt={`Payment ${num}`}
-                      style={{ height: "var(--footer-payment-icon-height-global-1, auto)" }}
+                      src={icon.src}
+                      alt={icon.alt}
+                      style={{
+                        display: "block", // avoids baseline gaps
+                        height: "auto",   // let the image keep its native height
+                        width: "auto",    // let the image keep its native width
+                      }}
                     />
                   </a>
                 ))}
               </div>
+
+
+
             </div>
           </div>
 
           {/* Quick Links */}
           <div className="col-lg-2 col-md-3 col-sm-5">
             <div className="footer__widget">
-              <h6
+            <h6
                 style={{
                   color: "var(--footer-heading-color-global-1, #111111)",
                   fontWeight: "var(--footer-heading-font-weight-global-1, 600)",
@@ -521,11 +576,12 @@ const handleStyleChange = (updates: StyleUpdates) => {
                   fontSize: "var(--footer-heading-font-size-global-1, 16px)",
                 }}
               >
-                Quick links
+                {footerOverlay?.props?.quickLinksTitle ?? "Quick links"}
               </h6>
+
               <ul>
-                {["About", "Blogs", "Contact", "FAQ"].map((t) => (
-                  <li key={t}>
+                {(footerOverlay?.props?.quickLinks ?? ["About", "Blogs", "Contact", "FAQ"]).map((t, i) => (
+                  <li key={`${i}-${t}`}>
                     <a
                       href="#"
                       style={{
@@ -539,6 +595,7 @@ const handleStyleChange = (updates: StyleUpdates) => {
                   </li>
                 ))}
               </ul>
+
             </div>
           </div>
 
@@ -554,31 +611,38 @@ const handleStyleChange = (updates: StyleUpdates) => {
                   fontSize: "var(--footer-heading-font-size-global-1, 16px)",
                 }}
               >
-                Account
+                {footerOverlay?.props?.accountTitle ?? "ACCOUNT"}
               </h6>
-              <ul>
-                {["My Account", "Orders Tracking", "Checkout", "Wishlist"].map((t) => (
-                  <li key={t}>
-                    <a
-                      href="#"
-                      style={{
-                        fontSize: "var(--footer-link-font-size-global-1, 14px)",
-                        color: "var(--footer-link-color-global-1, #666666)",
-                        lineHeight: "var(--footer-link-line-height-global-1, 30px)",
-                      }}
-                    >
-                      {t}
-                    </a>
-                  </li>
-                ))}
-              </ul>
+
+             <ul>
+              {(footerOverlay?.props?.accountLinks ?? [
+                "My Account",
+                "Orders Tracking",
+                "Checkout",
+                "Wishlist",
+              ]).map((t: string) => (
+                <li key={t}>
+                  <a
+                    href="#"
+                    style={{
+                      fontSize: "var(--footer-link-font-size-global-1, 14px)",
+                      color: "var(--footer-link-color-global-1, #666666)",
+                      lineHeight: "var(--footer-link-line-height-global-1, 30px)",
+                    }}
+                  >
+                    {t}
+                  </a>
+                </li>
+              ))}
+            </ul>
+
             </div>
           </div>
 
           {/* Newsletter */}
           <div className="col-lg-4 col-md-8 col-sm-8">
             <div className="footer__newslatter">
-              <h6
+             <h6
                 style={{
                   color: "var(--footer-heading-color-global-1, #111111)",
                   fontWeight: "var(--footer-heading-font-weight-global-1, 600)",
@@ -587,8 +651,9 @@ const handleStyleChange = (updates: StyleUpdates) => {
                   fontSize: "var(--footer-heading-font-size-global-1, 16px)",
                 }}
               >
-                NEWSLETTER
+                {footerOverlay?.props?.newsletterTitle ?? "NEWSLETTER"}
               </h6>
+
               <form action="#" style={{ position: "relative", marginBottom: "var(--footer-newsletter-form-margin-bottom-global-1, 30px)" }}>
                 <input
                   type="text"
@@ -605,7 +670,7 @@ const handleStyleChange = (updates: StyleUpdates) => {
                     background: "var(--footer-input-bg-global-1, #fff)",
                   }}
                 />
-                <button
+                <div
                   type="submit"
                   className="site-btn"
                   // let `.site-btn` do the heavy lifting; tokens are optional overrides
@@ -622,15 +687,22 @@ const handleStyleChange = (updates: StyleUpdates) => {
                     top: "var(--footer-button-top-global-1, 4px)",
                   }}
                 >
-                  Subscribe
-                </button>
+                  {footerOverlay?.props?.newsletterButton ?? "Subscribe"}
+                </div>
+
               </form>
 
               <div className="footer__social">
-                {["facebook", "twitter", "youtube-play", "instagram", "pinterest"].map((icon) => (
+                {(footerOverlay?.props?.socialLinks ?? [
+                  { icon: "fa fa-facebook", href: "#" },
+                  { icon: "fa fa-twitter", href: "#" },
+                  { icon: "fa fa-youtube-play", href: "#" },
+                  { icon: "fa fa-instagram", href: "#" },
+                  { icon: "fa fa-pinterest", href: "#" }
+                ]).map((social, index) => (
                   <a
-                    key={icon}
-                    href="#"
+                    key={index}
+                    href={social.href}
                     style={{
                       height: "var(--footer-social-size-global-1, 40px)",
                       width: "var(--footer-social-size-global-1, 40px)",
@@ -645,10 +717,11 @@ const handleStyleChange = (updates: StyleUpdates) => {
                       display: "inline-block",
                     }}
                   >
-                    <i className={`fa fa-${icon}`} />
+                    <i className={social.icon} />
                   </a>
                 ))}
               </div>
+
             </div>
           </div>
         </div>
