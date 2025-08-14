@@ -269,7 +269,8 @@ Exit Edit Mode: Global click listener + ESC handler + setEditingTarget(null)
 
 [Lucy Site](https://colorlib.com/wp/template/opium/)
 
-
-
 ## CI-CD - Design Tokens
 [CI-CD - Design Tokens](https://chatgpt.com/share/e/689d2016-d68c-8009-8055-310f1d5f4158)
+
+## Drop Zones
+[Drop Zones](https://chatgpt.com/share/e/689dc651-190c-8009-b69f-ab11ba432eac)

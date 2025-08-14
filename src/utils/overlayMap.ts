@@ -22,11 +22,11 @@ export const overlayMap = {
           { icon: "fa fa-pinterest", href: "#" }
         ],
         paymentIcons: [
-          { src: "/origin/base/web/img/payment/payment-1.png", alt: "Payment 1" },
-          { src: "/origin/base/web/img/payment/payment-2.png", alt: "Payment 2" },
-          { src: "/origin/base/web/img/payment/payment-3.png", alt: "Payment 3" },
-          { src: "/origin/base/web/img/payment/payment-4.png", alt: "Payment 4" },
-          { src: "/origin/base/web/img/payment/payment-5.png", alt: "Payment 5" }
+          { src: "src/origin/base/web/img/payment/payment-1.png", alt: "Payment 1" },
+          { src: "src/origin/base/web/img/payment/payment-2.png", alt: "Payment 2" },
+          { src: "src/origin/base/web/img/payment/payment-3.png", alt: "Payment 3" },
+          { src: "src/origin/base/web/img/payment/payment-4.png", alt: "Payment 4" },
+          { src: "src/origin/base/web/img/payment/payment-5.png", alt: "Payment 5" }
         ],
         copyrightText: `© ${new Date().getFullYear()} Crafted with passion 🚀 on <a href="https://budoboost.com" target="_blank" rel="noopener noreferrer">BudoBoost</a> — Empowering creators to launch beautiful sites in minutes.`
       },

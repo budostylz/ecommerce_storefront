@@ -1,14 +1,14 @@
 import React from "react";
 
+import insta1 from "@/origin/base/web/img/instagram/insta-1.jpg";
+import insta2 from "@/origin/base/web/img/instagram/insta-2.jpg";
+import insta3 from "@/origin/base/web/img/instagram/insta-3.jpg";
+import insta4 from "@/origin/base/web/img/instagram/insta-4.jpg";
+import insta5 from "@/origin/base/web/img/instagram/insta-5.jpg";
+import insta6 from "@/origin/base/web/img/instagram/insta-6.jpg";
+
 const Social: React.FC = () => {
-  const images = [
-    "/origin/base/web/Source/img/instagram/insta-1.jpg",
-    "/origin/base/web/Source/img/instagram/insta-2.jpg",
-    "/origin/base/web/Source/img/instagram/insta-3.jpg",
-    "/origin/base/web/Source/img/instagram/insta-4.jpg",
-    "/origin/base/web/Source/img/instagram/insta-5.jpg",
-    "/origin/base/web/Source/img/instagram/insta-6.jpg",
-  ];
+  const images = [insta1, insta2, insta3, insta4, insta5, insta6];
 
   return (
     <div className="instagram">
@@ -26,7 +26,7 @@ const Social: React.FC = () => {
                 }}
               >
                 <div className="instagram__text">
-                  <i className="fa fa-instagram"></i>
+                  <i className="fa fa-instagram" />
                   <a
                     href="https://www.instagram.com/ashion_shop"
                     target="_blank"

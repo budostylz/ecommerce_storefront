@@ -7,6 +7,11 @@ import toast from "react-hot-toast";
 import { setClickedInsideInspector } from "src/utils/inspectorClickGuard";
 import { normalizeValue } from "src/utils/normalizeValue";
 import FloatingStyleInspector from "@components/FloatingStyleInspector";
+import payment1 from "src/origin/base/web/img/payment/payment-1.png";
+import payment2 from "src/origin/base/web/img/payment/payment-2.png";
+import payment3 from "src/origin/base/web/img/payment/payment-3.png";
+import payment4 from "src/origin/base/web/img/payment/payment-4.png";
+import payment5 from "src/origin/base/web/img/payment/payment-5.png";
 
 
 const Footer: React.FC<FooterProps> = (props) => {
@@ -141,11 +146,11 @@ const {
   paymentButtons:
     props.paymentButtons ??
     footerOverlay?.props?.paymentButtons ?? [
-      "/origin/base/web/img/payment/payment-1.png",
-      "/origin/base/web/img/payment/payment-2.png",
-      "/origin/base/web/img/payment/payment-3.png",
-      "/origin/base/web/img/payment/payment-4.png",
-      "/origin/base/web/img/payment/payment-5.png",
+      "@/origin/base/web/img/payment/payment-1.png",
+      "@/origin/base/web/img/payment/payment-2.png",
+      "@/origin/base/web/img/payment/payment-3.png",
+      "@/origin/base/web/img/payment/payment-4.png",
+      "@/origin/base/web/img/payment/payment-5.png",
     ],
 
   copyrightText:
@@ -486,6 +491,27 @@ const handleNewsletterSubmit = (e: React.FormEvent) => {
   setNewsletterForm({ email: "" });
 };
 
+// Inside Footer component (top-level of the function component)
+const defaultPaymentIcons = React.useMemo(() => {
+  // Bundle all payment icons from src/origin/... via Vite
+  const files = import.meta.glob(
+    "@/origin/base/web/img/payment/payment-*.png",
+    { eager: true, as: "url" }
+  ) as Record<string, string>;
+
+  // Sort so 1..5 are in order, then map to {src, alt}
+  return Object.keys(files)
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+    .map((key, idx) => ({ src: files[key], alt: `Payment ${idx + 1}` }));
+}, []);
+
+// Prefer overlay -> props -> bundled defaults
+const paymentIcons =
+  footerOverlay?.props?.paymentIcons ??
+  props.paymentIcons ??
+  defaultPaymentIcons;
+
+
 
 
   /* Footer - Account List */
@@ -678,11 +704,11 @@ const commitQuickLinks = (next: string[]) => {
 
                <div className="footer__payment">
                 {(footerOverlay?.props?.paymentIcons ?? [
-                  { src: "/origin/base/web/img/payment/payment-1.png", alt: "Payment 1" },
-                  { src: "/origin/base/web/img/payment/payment-2.png", alt: "Payment 2" },
-                  { src: "/origin/base/web/img/payment/payment-3.png", alt: "Payment 3" },
-                  { src: "/origin/base/web/img/payment/payment-4.png", alt: "Payment 4" },
-                  { src: "/origin/base/web/img/payment/payment-5.png", alt: "Payment 5" },
+                  { src: payment1 , alt: "Payment 1" },
+                  { src: payment2, alt: "Payment 2" },
+                  { src: payment3, alt: "Payment 3" },
+                  { src: payment4, alt: "Payment 4" },
+                  { src: payment5, alt: "Payment 5" },
                 ]).map((icon, index) => (
                   <a
                     href="#"
