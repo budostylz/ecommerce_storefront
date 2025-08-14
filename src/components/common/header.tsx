@@ -30,6 +30,18 @@ const Header: React.FC<HeaderProps> = (props) => {
   console.log("setHeaderEditingTarget: ", setHeaderEditingTarget);
   console.log("headerOverlay: ", headerOverlay);
 
+  // Click Refs
+  const loginClickPosRef = useRef<number | null>(null);
+  const registerClickPosRef = useRef<number | null>(null);
+  const menuClickPosRefs = useRef<number[]>([]);
+  const dropdownClickPosRefs = useRef<number[][]>([]);
+
+
+
+
+   /** Root element ref (used for click-outside) */
+  const headerSectionRef = useRef<HTMLElement | null>(null);
+
   /** Top-level */
   const logoRef = useRef<HTMLInputElement | null>(null); // logo URL
 
@@ -106,6 +118,9 @@ const Header: React.FC<HeaderProps> = (props) => {
   } as const;
 
   console.log('isDesignMode: ', isDesignMode);
+  console.log('logo: ', logo);
+  console.log('menu: ', menu);
+  console.log('auth: ', widgets);
 
   // ===== Only apply the tokens that this overlay cares about =====
 const tokensForHeader = useMemo(() => {
@@ -141,64 +156,62 @@ const tokensForHeader = useMemo(() => {
   }, []);
 
 useEffect(() => {
-  if (headerEditingTarget?.componentKey === "header") {
-    const { field, index, subIndex } = headerEditingTarget as {
-      field?: string;
-      index?: number;
-      subIndex?: number;
-    };
+  if (headerEditingTarget?.componentKey !== "header") return;
 
-    switch (field) {
-      // Logo
-      case "logo":
-        logoRef.current?.focus();
-        break;
+  const { field, index, subIndex } = headerEditingTarget as {
+    field?: string;
+    index?: number;
+    subIndex?: number;
+  };
 
-      // Top-level menu items OR nested dropdown items
-      case "menu":
-        if (typeof index === "number") {
-          // If subIndex provided, focus dropdown item
-          if (typeof subIndex === "number") {
-            const list = dropdownItemRefs.current[index] || [];
-            (list[subIndex] ?? null)?.focus?.();
-          } else {
-            // Otherwise focus the parent menu link
-            (menuItemRefs.current[index] ?? null)?.focus?.();
-          }
+  switch (field) {
+    case "logo":
+      logoRef.current?.focus();
+      break;
+
+    case "menu": {
+      if (typeof index === "number") {
+        if (typeof subIndex === "number") {
+          // dropdown item (label)
+          const list = menuDropdownLabelRefs.current[index] || [];
+          (list[subIndex] ?? null)?.focus?.();
+        } else {
+          // top-level item (label)
+          (menuLabelRefs.current[index] ?? null)?.focus?.();
         }
-        break;
-
-      // Auth links
-      case "auth.login":
-      case "auth.loginLabel":
-        loginRef.current?.focus();
-        break;
-
-      case "auth.register":
-      case "auth.registerLabel":
-        registerRef.current?.focus();
-        break;
-
-      // Widgets
-      case "widgets.search":
-        searchIconRef.current?.focus();
-        break;
-
-      case "widgets.wishlist":
-      case "widgets.wishlistCount":
-        wishlistRef.current?.focus();
-        break;
-
-      case "widgets.cart":
-      case "widgets.cartCount":
-        cartRef.current?.focus();
-        break;
-
-      default:
-        break;
+      }
+      break;
     }
+
+    case "auth.login":
+    case "auth.loginLabel":
+      loginLabelRef.current?.focus();
+      break;
+
+    case "auth.register":
+    case "auth.registerLabel":
+      registerLabelRef.current?.focus();
+      break;
+
+    case "widgets.search":
+      showSearchRef.current?.focus();
+      break;
+
+    case "widgets.wishlist":
+    case "widgets.wishlistCount":
+      wishlistCountRef.current?.focus();
+      break;
+
+    case "widgets.cart":
+    case "widgets.cartCount":
+      cartCountRef.current?.focus();
+      break;
+
+    default:
+      break;
   }
 }, [headerEditingTarget]);
+
 
 useEffect(() => {
   if (!isDesignMode || !headerEditingTarget) return;
@@ -237,7 +250,7 @@ useEffect(() => {
       document.documentElement.style.setProperty(key, value);
     }
   });
-}, [designTokens, headerEditingTarget, isDesignMode, overlayMap]);
+}, [designTokens, headerEditingTarget, isDesignMode]);
 
 // 1) Apply header tokens
 useEffect(() => {
@@ -268,8 +281,6 @@ useEffect(() => {
   };
 }, [isDesignMode, setHeaderEditingTarget]);
 
-// Suffix for design tokens naming
-const HEADER_SUFFIX = "global-1";
 
 const handleHeaderStyleChange = (updates: StyleUpdates) => {
   if (!headerEditingTarget || headerEditingTarget.componentKey !== "header") return;
@@ -355,8 +366,10 @@ const handleHeaderStyleChange = (updates: StyleUpdates) => {
 };
 
 // Token helper (header/global)
+// Suffix for design tokens naming (Header)
+const HEADER_SUFFIX = "global-0";
 const getHeaderToken = (key: string, index?: number) => {
-  const suffix = index !== undefined ? `global-${index}` : "global-1";
+  const suffix = index !== undefined ? `global-${index}` : "global-0";
   return `--header-${key}-${suffix}`;
 };
 
@@ -444,7 +457,7 @@ const showHeaderInspector =
   const [searchOpen, setSearchOpen] = useState(false);
 
   return (
-    <header className="header" style={headerStyle}>
+    <header ref={headerSectionRef} className="header" style={headerStyle}>
       <div className="container-fluid">
         <div className="row align-items-center">
           {/* Logo */}
@@ -469,34 +482,137 @@ const showHeaderInspector =
 
           {/* Navigation Menu */}
           <div className="col-xl-6 col-lg-7">
-            <nav className="header__menu" style={menuWrapStyle}>
-              <ul>
-                <li>
-                  <a href="/" style={menuLinkStyle}>Home</a>
-                </li>
-                <li>
-                  <a href="#" style={menuLinkStyle}>Women’s</a>
-                </li>
-                <li>
-                  <a href="#" style={menuLinkStyle}>Men’s</a>
-                </li>
-                <li className="active">
-                  <a href="./shop.html" style={menuLinkStyle}>Shop</a>
-                </li>
-                <li>
-                  <a href="#" style={menuLinkStyle}>Pages</a>
-                  <ul className="dropdown" style={dropdownStyle}>
-                    <li><a href="./product-details.html" style={dropdownLinkStyle}>Product Details</a></li>
-                    <li><a href="./shop-cart.html" style={dropdownLinkStyle}>Shop Cart</a></li>
-                    <li><a href="./checkout.html" style={dropdownLinkStyle}>Checkout</a></li>
-                    <li><a href="./blog-details.html" style={dropdownLinkStyle}>Blog Details</a></li>
-                  </ul>
-                </li>
-                <li>
-                  <a href="contact" style={menuLinkStyle}>Contact</a>
-                </li>
-              </ul>
-            </nav>
+          <nav className="header__menu">
+  <ul>
+    {menu.map((item, idx) => (
+      <li key={`menu-${idx}`} className={item.active ? "active" : undefined}>
+        {isDesignMode &&
+        headerEditingTarget?.componentKey === "header" &&
+        headerEditingTarget.field === "menu" &&
+        headerEditingTarget.index === idx &&
+        headerEditingTarget.subIndex === undefined ? (
+          <textarea
+            ref={(el) => {
+              menuLabelRefs.current[idx] = el;
+              const pos = menuClickPosRefs.current[idx];
+              if (el && typeof pos === "number") {
+                el.selectionStart = el.selectionEnd = pos;
+                menuClickPosRefs.current[idx] = undefined as any;
+              }
+            }}
+            value={item.label}
+            onChange={(e) => {
+              const next = [...menu];
+              next[idx] = { ...next[idx], label: e.target.value };
+              updateHeaderComponentProps("global", "header", { menu: next });
+            }}
+            onClick={(e) => {
+              setClickedInsideInspector();
+              e.stopPropagation();
+            }}
+          />
+        ) : (
+          <a
+            href={item.href}
+            onMouseDown={(e) => {
+              if (!isDesignMode) return;
+              const r = (document as any).caretRangeFromPoint?.(e.clientX, e.clientY);
+              if (r && typeof r.startOffset === "number") {
+                menuClickPosRefs.current[idx] = r.startOffset;
+              }
+            }}
+            onClick={(e) => {
+              if (!isDesignMode) return;
+              e.preventDefault();
+              e.stopPropagation();
+              setHeaderEditingTarget({
+                route: "global",
+                componentKey: "header",
+                field: "menu",
+                index: idx,
+              });
+            }}
+          >
+            {item.label}
+          </a>
+        )}
+
+        {Array.isArray(item.dropdown) && item.dropdown.length > 0 && (
+          <ul className="dropdown">
+            {item.dropdown.map((dd, j) => (
+              <li key={`menu-${idx}-dd-${j}`}>
+                {isDesignMode &&
+                headerEditingTarget?.componentKey === "header" &&
+                headerEditingTarget.field === "menu" &&
+                headerEditingTarget.index === idx &&
+                headerEditingTarget.subIndex === j ? (
+                  <textarea
+                    ref={(el) => {
+                      if (!menuDropdownLabelRefs.current[idx]) {
+                        menuDropdownLabelRefs.current[idx] = [];
+                      }
+                      menuDropdownLabelRefs.current[idx][j] = el;
+                      const pos = dropdownClickPosRefs.current[idx]?.[j];
+                      if (el && typeof pos === "number") {
+                        el.selectionStart = el.selectionEnd = pos;
+                        if (!dropdownClickPosRefs.current[idx]) {
+                          dropdownClickPosRefs.current[idx] = [];
+                        }
+                        dropdownClickPosRefs.current[idx][j] = undefined as any;
+                      }
+                    }}
+                    value={dd.label}
+                    onChange={(e) => {
+                      const next = [...menu];
+                      const ddArr = (next[idx].dropdown ?? []).slice();
+                      ddArr[j] = { ...ddArr[j], label: e.target.value };
+                      next[idx] = { ...next[idx], dropdown: ddArr };
+                      updateHeaderComponentProps("global", "header", { menu: next });
+                    }}
+                    onClick={(e) => {
+                      setClickedInsideInspector();
+                      e.stopPropagation();
+                    }}
+                  />
+                ) : (
+                  <a
+                    href={dd.href}
+                    onMouseDown={(e) => {
+                      if (!isDesignMode) return;
+                      const r = (document as any).caretRangeFromPoint?.(e.clientX, e.clientY);
+                      if (r && typeof r.startOffset === "number") {
+                        if (!dropdownClickPosRefs.current[idx]) {
+                          dropdownClickPosRefs.current[idx] = [];
+                        }
+                        dropdownClickPosRefs.current[idx][j] = r.startOffset;
+                      }
+                    }}
+                    onClick={(e) => {
+                      if (!isDesignMode) return;
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setHeaderEditingTarget({
+                        route: "global",
+                        componentKey: "header",
+                        field: "menu",
+                        index: idx,
+                        subIndex: j,
+                      });
+                    }}
+                  >
+                    {dd.label}
+                  </a>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </li>
+    ))}
+  </ul>
+</nav>
+
+
           </div>
 
           {/* Right Side */}
@@ -505,10 +621,135 @@ const showHeaderInspector =
               className="header__right"
               style={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}
             >
-              <div className="header__right__auth">
-                <a href="#" style={authLinkStyle}>Login</a>
-                <a href="#" style={authLinkStyle}>Register</a>
-              </div>
+             <div className="header__right__auth">
+               
+              {/* Login (editable) */}
+              {isDesignMode &&
+              headerEditingTarget?.componentKey === "header" &&
+              headerEditingTarget.field === "auth.loginLabel" ? (
+                <textarea
+                  ref={(el) => {
+                    loginLabelRef.current = el;
+                    if (el && loginClickPosRef.current !== null) {
+                      el.selectionStart = el.selectionEnd = loginClickPosRef.current;
+                      loginClickPosRef.current = null;
+                    }
+                  }}
+                  value={auth?.loginLabel ?? "Login"}
+                  onChange={(e) => {
+                    // merge back into overlay props
+                    updateHeaderComponentProps("global", "header", {
+                      auth: { ...(auth || {}), loginLabel: e.target.value },
+                    });
+                  }}
+                  onClick={(e) => {
+                    setClickedInsideInspector();
+                    e.stopPropagation();
+                  }}
+                  style={{
+                    width: "100%",
+                    fontFamily: "var(--header-font-family-global-0, Montserrat, sans-serif)",
+                    fontSize: "var(--header-auth-font-size-global-0, 12px)",
+                    fontWeight: "var(--header-auth-font-weight-global-0, 400)",
+                    color: "var(--header-auth-color-global-0, #666666)",
+                    background: "transparent",
+                    border: "none",
+                    outline: "none",
+                    resize: "none",
+                    whiteSpace: "pre-wrap",
+                  }}
+                />
+              ) : (
+                <a
+                  href="#"
+                  style={authLinkStyle}
+                  onMouseDown={(e) => {
+                    if (!isDesignMode) return;
+                    const r = (document as any).caretRangeFromPoint?.(e.clientX, e.clientY);
+                    if (r && typeof r.startOffset === "number") {
+                      loginClickPosRef.current = r.startOffset;
+                    }
+                  }}
+                  onClick={(e) => {
+                    if (!isDesignMode) return;
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setHeaderEditingTarget({
+                      route: "global",
+                      componentKey: "header",
+                      field: "auth.loginLabel",
+                    });
+                  }}
+                >
+                  {auth?.loginLabel ?? "Login"}
+                </a>
+              )}
+
+
+
+                {/* Register (editable) */}
+                {isDesignMode &&
+                headerEditingTarget?.componentKey === "header" &&
+                headerEditingTarget.field === "auth.registerLabel" ? (
+                  <textarea
+                    ref={(el) => {
+                      registerLabelRef.current = el;
+                      if (el && registerClickPosRef.current !== null) {
+                        el.selectionStart = el.selectionEnd = registerClickPosRef.current;
+                        registerClickPosRef.current = null;
+                      }
+                    }}
+                    value={auth?.registerLabel ?? "Register"}
+                    onChange={(e) => {
+                      updateHeaderComponentProps("global", "header", {
+                        auth: { ...(auth || {}), registerLabel: e.target.value },
+                      });
+                    }}
+                    onClick={(e) => {
+                      setClickedInsideInspector();
+                      e.stopPropagation();
+                    }}
+                    style={{
+                      width: "100%",
+                      fontFamily: "var(--header-font-family-global-0, Montserrat, sans-serif)",
+                      fontSize: "var(--header-auth-font-size-global-0, 12px)",
+                      fontWeight: "var(--header-auth-font-weight-global-0, 400)",
+                      color: "var(--header-auth-color-global-0, #666666)",
+                      background: "transparent",
+                      border: "none",
+                      outline: "none",
+                      resize: "none",
+                      whiteSpace: "pre-wrap",
+                    }}
+                  />
+                ) : (
+                  <a
+                    href="#"
+                    style={authLinkStyle}
+                    onMouseDown={(e) => {
+                      if (!isDesignMode) return;
+                      const r = (document as any).caretRangeFromPoint?.(e.clientX, e.clientY);
+                      if (r && typeof r.startOffset === "number") {
+                        registerClickPosRef.current = r.startOffset;
+                      }
+                    }}
+                    onClick={(e) => {
+                      if (!isDesignMode) return;
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setHeaderEditingTarget({
+                        route: "global",
+                        componentKey: "header",
+                        field: "auth.registerLabel",
+                      });
+                    }}
+                  >
+                    {auth?.registerLabel ?? "Register"}
+                  </a>
+                )}
+
+            </div>
+
               <ul className="header__right__widget">
                 <li>
                   <span

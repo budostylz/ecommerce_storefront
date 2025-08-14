@@ -307,9 +307,6 @@ useEffect(() => {
 }, [isDesignMode, setFooterEditingTarget]);
 
 
-// Suffix for design tokens naming
-const FOOTER_SUFFIX = "global-1";
-
 const handleStyleChange = (updates: StyleUpdates) => {
   if (!footerEditingTarget || footerEditingTarget.componentKey !== "footer") return;
 
@@ -472,8 +469,7 @@ const showFooterInspector =
   console.log('footerOverlay?.props?.socialLinks: ', footerOverlay?.props?.socialLinks);
   */
 
-
-  /* LOCAL FOOTER LOGIC */
+  
 
   // Newsletter form state
 const [newsletterForm, setNewsletterForm] = useState({ email: "" });
