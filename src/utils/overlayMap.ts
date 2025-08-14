@@ -96,7 +96,69 @@ export const overlayMap = {
         "--footer-copyright-link-hover-color-global-0",
         "--footer-copyright-heart-color-global-0"
       ]
-    }
+    },
+      header: {
+      component: "Header",
+      props: {
+        logo: "https://storage.googleapis.com/budoapps-5aacf.firebasestorage.app/templates/ecommerce/fashio/logo.png",
+        menu: [
+          { label: "Home", href: "/" },
+          { label: "Women’s", href: "#" },
+          { label: "Men’s", href: "#" },
+          { label: "Shop", href: "./shop.html", active: true },
+          {
+            label: "Pages",
+            href: "#",
+            dropdown: [
+              { label: "Product Details", href: "./product-details.html" },
+              { label: "Shop Cart", href: "./shop-cart.html" },
+              { label: "Checkout", href: "./checkout.html" },
+              { label: "Blog Details", href: "./blog-details.html" }
+            ]
+          },
+          { label: "Contact", href: "contact" }
+        ],
+        auth: { loginLabel: "Login", registerLabel: "Register" },
+        widgets: {
+          showSearch: true,
+          wishlistCount: 2,
+          cartCount: 2
+        }
+      },
+      tokens: [
+        // section
+        "--header-section-bg-global-0",
+
+        // shared font family
+        "--header-font-family-global-0",
+
+        // menu
+        "--header-menu-text-align-global-0",
+        "--header-menu-item-font-size-global-0",
+        "--header-menu-item-font-weight-global-0",
+        "--header-menu-item-color-global-0",
+
+        // dropdown
+        "--header-dropdown-bg-global-0",
+        "--header-dropdown-text-align-global-0",
+        "--header-dropdown-item-font-size-global-0",
+        "--header-dropdown-item-font-weight-global-0",
+        "--header-dropdown-item-color-global-0",
+
+        // auth links
+        "--header-auth-font-size-global-0",
+        "--header-auth-font-weight-global-0",
+        "--header-auth-color-global-0",
+
+        // right-side widgets (icons)
+        "--header-widget-icon-font-size-global-0",
+        "--header-widget-icon-font-weight-global-0",
+        "--header-widget-icon-color-global-0",
+
+        // logo
+        "--header-logo-max-height-global-0"
+      ]
+    },
   },
 '/contact': {
     contact: {

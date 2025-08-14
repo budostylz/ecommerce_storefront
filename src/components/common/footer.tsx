@@ -25,12 +25,12 @@ const Footer: React.FC<Footerrops> = (props) => {
   // This component’s overlay node
   const footerOverlay = footerOverlayState?.["global"]?.footer;
 
-  console.log("footerOverlayState: ", footerOverlayState);
+  /*console.log("footerOverlayState: ", footerOverlayState);
   console.log("footerTokensBag: ", footerTokensBag);
   console.log("updateFooterDesignToken: ", updateFooterDesignToken);
   console.log("footerEditingTarget: ", footerEditingTarget);
   console.log("setFooterEditingTarget: ", setFooterEditingTarget);
-  console.log("footerOverlay: ", footerOverlay);
+  console.log("footerOverlay: ", footerOverlay);*/
 
 
   // Refs for editable text fields in Footer
@@ -156,7 +156,7 @@ const {
   onSubscribe: props.onSubscribe, // optional handler for newsletter submit
   isDesignMode: props.isDesignMode ?? true,
 } as const;
-console.log('isDesignMode: ', isDesignMode);
+//console.log('isDesignMode: ', isDesignMode);
 
 
 // Only apply the tokens that this overlay cares about (values from designTokens)
@@ -472,6 +472,7 @@ const showFooterInspector =
   footerEditingTarget?.componentKey === "footer" &&
   footerAllowedFields.includes(footerEditingTarget.field as typeof footerAllowedFields[number]);
 
+  /*
   console.log('footerOverlay?.props: ', footerOverlay?.props);
   console.log('footerOverlay?.props?.logo: ', footerOverlay?.props?.logo);
   console.log('footerOverlay?.props?.aboutText: ', footerOverlay?.props?.aboutText);
@@ -483,6 +484,7 @@ const showFooterInspector =
   console.log('footerOverlay?.props?.newsletterTitle: ', footerOverlay?.props?.newsletterTitle);
   console.log('footerOverlay?.props?.newsletterButton: ', footerOverlay?.props?.newsletterButton);
   console.log('footerOverlay?.props?.socialLinks: ', footerOverlay?.props?.socialLinks);
+  */
 
 
 

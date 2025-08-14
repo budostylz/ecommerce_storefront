@@ -133,7 +133,54 @@ export const designTokens: Record<string, string> = {
   "--footer-copyright-text-color-global-0": "#666666",
   "--footer-copyright-link-color-global-0": "#5c5c5c",
   "--footer-copyright-link-hover-color-global-0": "#ca1515",
-  "--footer-copyright-heart-color-global-0": "#ca1515"
+  "--footer-copyright-heart-color-global-0": "#ca1515",
+
+
+  "--header-bg-global-0": "#ffffff",
+  "--header-font-family-global-0": "\"Montserrat\", sans-serif",
+
+  "--header-menu-link-font-family-global-0": "\"Montserrat\", sans-serif",
+  "--header-menu-link-font-size-global-0": "15px",
+  "--header-menu-link-color-global-0": "#111111",
+  "--header-menu-link-font-weight-global-0": "500",
+  "--header-menu-text-align-global-0": "left",
+
+  "--header-menu-dropdown-bg-global-0": "#111111",
+  "--header-menu-dropdown-link-font-family-global-0": "\"Montserrat\", sans-serif",
+  "--header-menu-dropdown-link-font-size-global-0": "14px",
+  "--header-menu-dropdown-link-color-global-0": "#ffffff",
+  "--header-menu-dropdown-link-font-weight-global-0": "400",
+  "--header-menu-dropdown-text-align-global-0": "left",
+
+  "--header-auth-link-font-family-global-0": "\"Montserrat\", sans-serif",
+  "--header-auth-link-font-size-global-0": "12px",
+  "--header-auth-link-color-global-0": "#666666",
+  "--header-auth-link-font-weight-global-0": "400",
+  "--header-right-text-align-global-0": "right",
+
+  "--header-widget-icon-font-size-global-0": "18px",
+  "--header-widget-icon-color-global-0": "#111111",
+  "--header-widget-icon-font-weight-global-0": "400",
+
+  "--header-widget-tip-bg-global-0": "#111111",
+  "--header-widget-tip-font-size-global-0": "10px",
+  "--header-widget-tip-color-global-0": "#ffffff",
+  "--header-widget-tip-font-weight-global-0": "500",
+  "--header-widget-tip-text-align-global-0": "center",
+
+  "--canvas-open-font-size-global-0": "22px",
+  "--canvas-open-color-global-0": "#222222",
+  "--canvas-open-bg-global-0": "transparent",
+  "--canvas-open-font-weight-global-0": "400",
+  "--canvas-open-text-align-global-0": "center"
+  
+
+
+
+
+
+
+  
 
 };
 
