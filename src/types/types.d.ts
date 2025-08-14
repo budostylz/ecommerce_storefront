@@ -62,4 +62,39 @@ type FooterProps = {
 };
 
 
+// Header types
+type HeaderMenuChild = {
+  label: string;
+  href: string;
+};
+
+type HeaderMenuItem = {
+  label: string;
+  href: string;
+  active?: boolean;
+  dropdown?: HeaderMenuChild[];
+};
+
+type HeaderAuth = {
+  loginLabel?: string;
+  registerLabel?: string;
+};
+
+type HeaderWidgets = {
+  showSearch?: boolean;
+  wishlistCount?: number;
+  cartCount?: number;
+};
+
+type HeaderProps = {
+  logo?: string;
+  menu?: HeaderMenuItem[];
+  auth?: HeaderAuth;
+  widgets?: HeaderWidgets;
+  isDesignMode?: boolean;
+  page?: string;
+
+  // optional handler similar in spirit to Footer's onSubscribe
+  onSearchSubmit?: (query: string) => void;
+};
 

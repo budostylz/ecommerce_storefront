@@ -9,7 +9,7 @@ import { normalizeValue } from "src/utils/normalizeValue";
 import FloatingStyleInspector from "@components/FloatingStyleInspector";
 
 
-const Footer: React.FC<Footerrops> = (props) => {
+const Footer: React.FC<FooterProps> = (props) => {
   const currentYear = new Date().getFullYear();
 
   // Zustand state for Footer
@@ -306,20 +306,6 @@ useEffect(() => {
   return () => window.removeEventListener("keydown", onKey);
 }, [isDesignMode, setFooterEditingTarget]);
 
-// Newsletter form state
-const [newsletterForm, setNewsletterForm] = useState({ email: "" });
-
-// Change handler
-const handleNewsletterChange = (
-  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-) => setNewsletterForm((f) => ({ ...f, [e.target.name]: e.target.value }));
-
-// Submit handler
-const handleNewsletterSubmit = (e: React.FormEvent) => {
-  e.preventDefault();
-  onSubscribe?.(newsletterForm);
-  setNewsletterForm({ email: "" });
-};
 
 // Suffix for design tokens naming
 const FOOTER_SUFFIX = "global-1";
@@ -485,6 +471,24 @@ const showFooterInspector =
   console.log('footerOverlay?.props?.newsletterButton: ', footerOverlay?.props?.newsletterButton);
   console.log('footerOverlay?.props?.socialLinks: ', footerOverlay?.props?.socialLinks);
   */
+
+
+  /* LOCAL FOOTER LOGIC */
+
+  // Newsletter form state
+const [newsletterForm, setNewsletterForm] = useState({ email: "" });
+
+// Change handler
+const handleNewsletterChange = (
+  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+) => setNewsletterForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+
+// Submit handler
+const handleNewsletterSubmit = (e: React.FormEvent) => {
+  e.preventDefault();
+  onSubscribe?.(newsletterForm);
+  setNewsletterForm({ email: "" });
+};
 
 
 

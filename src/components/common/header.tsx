@@ -8,7 +8,7 @@ import { setClickedInsideInspector } from "src/utils/inspectorClickGuard";
 import { normalizeValue } from "src/utils/normalizeValue";
 import FloatingStyleInspector from "@components/FloatingStyleInspector";
 
-const Header = () => {
+const Header: React.FC<HeaderProps> = (props) => {
 
   // Zustand state for Footer
   const headerOverlayState = usePreviewStore((s) => s.overlayMap);
@@ -50,6 +50,341 @@ const Header = () => {
   const showSearchRef    = useRef<HTMLInputElement | null>(null);       // checkbox
   const wishlistCountRef = useRef<HTMLInputElement | null>(null);       // number input
   const cartCountRef     = useRef<HTMLInputElement | null>(null);       // number input
+
+  // Device detection
+  const [isMobileOrTablet, setIsMobileOrTablet] = useState(false);
+
+  // Merge overlay props (incoming props win over overlay; then fall back to sane defaults)
+  const {
+    logo,
+    menu,
+    auth,
+    widgets,
+    isDesignMode,
+  } = {
+    logo:
+      props.logo ??
+      headerOverlay?.props?.logo ??
+      "https://storage.googleapis.com/budoapps-5aacf.firebasestorage.app/templates/ecommerce/fashio/logo.png",
+
+    menu:
+      props.menu ??
+      headerOverlay?.props?.menu ?? [
+        { label: "Home", href: "/" },
+        { label: "Women’s", href: "#" },
+        { label: "Men’s", href: "#" },
+        { label: "Shop", href: "./shop.html", active: true },
+        {
+          label: "Pages",
+          href: "#",
+          dropdown: [
+            { label: "Product Details", href: "./product-details.html" },
+            { label: "Shop Cart", href: "./shop-cart.html" },
+            { label: "Checkout", href: "./checkout.html" },
+            { label: "Blog Details", href: "./blog-details.html" },
+          ],
+        },
+        { label: "Contact", href: "contact" },
+      ],
+
+    auth:
+      props.auth ??
+      headerOverlay?.props?.auth ?? {
+        loginLabel: "Login",
+        registerLabel: "Register",
+      },
+
+    widgets:
+      props.widgets ??
+      headerOverlay?.props?.widgets ?? {
+        showSearch: true,
+        wishlistCount: 2,
+        cartCount: 2,
+      },
+
+    isDesignMode: props.isDesignMode ?? true,
+  } as const;
+
+  console.log('isDesignMode: ', isDesignMode);
+
+  // ===== Only apply the tokens that this overlay cares about =====
+const tokensForHeader = useMemo(() => {
+  const wantedKeys = headerOverlay?.tokens ?? [];
+  const bag = headerTokensBag ?? {};
+  const subset: Record<string, string> = {};
+
+  wantedKeys.forEach((k: string) => {
+    if (k in bag) subset[k] = bag[k] as string;
+  });
+
+  // If overlay is missing or empty, fall back to the whole bag
+  return Object.keys(subset).length ? subset : (bag as Record<string, string>);
+}, [headerOverlay, headerTokensBag]);
+
+
+  useEffect(() => {
+    const checkDevice = () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const isTablet = w <= 1024 && w > 640;
+      const isMobile = w <= 640;
+      const isLandscape = w > h;
+      setIsMobileOrTablet(isMobile || isTablet || isLandscape);
+    };
+    checkDevice();
+    window.addEventListener("resize", checkDevice);
+    window.addEventListener("orientationchange", checkDevice);
+    return () => {
+      window.removeEventListener("resize", checkDevice);
+      window.removeEventListener("orientationchange", checkDevice);
+    };
+  }, []);
+
+useEffect(() => {
+  if (headerEditingTarget?.componentKey === "header") {
+    const { field, index, subIndex } = headerEditingTarget as {
+      field?: string;
+      index?: number;
+      subIndex?: number;
+    };
+
+    switch (field) {
+      // Logo
+      case "logo":
+        logoRef.current?.focus();
+        break;
+
+      // Top-level menu items OR nested dropdown items
+      case "menu":
+        if (typeof index === "number") {
+          // If subIndex provided, focus dropdown item
+          if (typeof subIndex === "number") {
+            const list = dropdownItemRefs.current[index] || [];
+            (list[subIndex] ?? null)?.focus?.();
+          } else {
+            // Otherwise focus the parent menu link
+            (menuItemRefs.current[index] ?? null)?.focus?.();
+          }
+        }
+        break;
+
+      // Auth links
+      case "auth.login":
+      case "auth.loginLabel":
+        loginRef.current?.focus();
+        break;
+
+      case "auth.register":
+      case "auth.registerLabel":
+        registerRef.current?.focus();
+        break;
+
+      // Widgets
+      case "widgets.search":
+        searchIconRef.current?.focus();
+        break;
+
+      case "widgets.wishlist":
+      case "widgets.wishlistCount":
+        wishlistRef.current?.focus();
+        break;
+
+      case "widgets.cart":
+      case "widgets.cartCount":
+        cartRef.current?.focus();
+        break;
+
+      default:
+        break;
+    }
+  }
+}, [headerEditingTarget]);
+
+useEffect(() => {
+  if (!isDesignMode || !headerEditingTarget) return;
+  if (headerEditingTarget.componentKey !== "header") return;
+
+  // Token domain comes from the first segment (e.g., "auth.loginLabel" -> "auth").
+  // Map dotted or plural fields to the header token namespaces.
+  const rawField = (headerEditingTarget.field || "").toLowerCase();
+  const baseField = rawField.split(".")[0]; // e.g., "widgets.cartCount" -> "widgets"
+
+  const DOMAIN_ALIAS: Record<string, string> = {
+    widgets: "widget", // tokens use --header-widget-*
+    widget: "widget",
+    menu: "menu",
+    auth: "auth",
+    dropdown: "dropdown",
+    logo: "logo",
+    section: "section",
+    mobile: "mobile-button", // if you ever target the canvas button as "mobile"
+    button: "mobile-button",
+  };
+
+  const domain = DOMAIN_ALIAS[baseField] ?? baseField;
+
+  const page = "global";        // Header lives under overlayMap["global"]
+  const suffix = "global-0";    // Header token suffix (per your naming)
+  const prefix = `--header-${domain}-`;
+
+  const candidateKeys = (overlayMap[page]?.header?.tokens || []).filter(
+    (key: string) => key.startsWith(prefix) && key.endsWith(suffix)
+  );
+
+  candidateKeys.forEach((key: string) => {
+    const value = (designTokens as any)[key];
+    if (value !== undefined) {
+      document.documentElement.style.setProperty(key, value);
+    }
+  });
+}, [designTokens, headerEditingTarget, isDesignMode, overlayMap]);
+
+// 1) Apply header tokens
+useEffect(() => {
+  applyDesignTokens(tokensForHeader);
+}, [tokensForHeader]);
+
+// 2) Click-away to exit edit mode for Header
+useEffect(() => {
+  if (!isDesignMode) return;
+
+  const onGlobalPointerDown = (e: MouseEvent) => {
+    const root = headerSectionRef.current;
+    const target = e.target as Node | null;
+
+    if (!root || !target) return;          // no section yet
+    if (root.contains(target)) return;     // click inside header -> ignore
+
+    // Respect inspector click guard if you enable it:
+    // if (wasClickInsideInspector()) return;
+
+    setHeaderEditingTarget(null);          // click outside -> exit edit mode
+  };
+
+  // Use capture phase so we run before other handlers stopPropagation
+  document.addEventListener("pointerdown", onGlobalPointerDown, true);
+  return () => {
+    document.removeEventListener("pointerdown", onGlobalPointerDown, true);
+  };
+}, [isDesignMode, setHeaderEditingTarget]);
+
+// Suffix for design tokens naming
+const HEADER_SUFFIX = "global-1";
+
+const handleHeaderStyleChange = (updates: StyleUpdates) => {
+  if (!headerEditingTarget || headerEditingTarget.componentKey !== "header") return;
+
+  const { field } = headerEditingTarget;
+
+  const setToken = (token: string, val: string | number) => {
+    updateHeaderDesignToken(token, normalizeValue(token, String(val)));
+  };
+
+  // generic text family: font, size, weight, transform, align, line-height, color
+  const mapCommon = (prefix: string) => {
+    if (updates.fontFamily)    setToken(`--${prefix}-font-family-${HEADER_SUFFIX}`, updates.fontFamily);
+    if (updates.fontSize)      setToken(`--${prefix}-font-size-${HEADER_SUFFIX}`, updates.fontSize);
+    if (updates.fontWeight)    setToken(`--${prefix}-font-weight-${HEADER_SUFFIX}`, updates.fontWeight);
+    if (updates.textTransform) setToken(`--${prefix}-text-transform-${HEADER_SUFFIX}`, updates.textTransform);
+    if (updates.textAlign)     setToken(`--${prefix}-text-align-${HEADER_SUFFIX}`, updates.textAlign);
+    if (updates.lineHeight)    setToken(`--${prefix}-line-height-${HEADER_SUFFIX}`, updates.lineHeight);
+    if (updates.textColor)     setToken(`--${prefix}-color-${HEADER_SUFFIX}`, updates.textColor);
+  };
+
+  switch (field) {
+    /** Whole header section container */
+    case "section": {
+      if (updates.backgroundColor) setToken(`--header-section-bg-${HEADER_SUFFIX}`, updates.backgroundColor);
+      break;
+    }
+
+    /** Logo image block */
+    case "logo": {
+      if (updates.maxHeight) setToken(`--header-logo-max-height-${HEADER_SUFFIX}`, updates.maxHeight);
+      break;
+    }
+
+    /** Menu wrapper (e.g., center/left/right alignment) */
+    case "menuWrap": {
+      if (updates.textAlign) setToken(`--header-menu-text-align-${HEADER_SUFFIX}`, updates.textAlign);
+      break;
+    }
+
+    /** Top-level menu links */
+    case "menuItem": {
+      mapCommon("header-menu-item");
+      break;
+    }
+
+    /** Dropdown container + items */
+    case "dropdown": {
+      if (updates.backgroundColor) setToken(`--header-dropdown-bg-${HEADER_SUFFIX}`, updates.backgroundColor);
+      mapCommon("header-dropdown-item");
+      break;
+    }
+
+    /** Auth links (Login / Register) */
+    case "authLink": {
+      mapCommon("header-auth");
+      break;
+    }
+
+    /** Header right-side icons (search, heart, bag) */
+    case "widgetIcon": {
+      // treat like text, but the tokens are named for icons
+      if (updates.fontSize)   setToken(`--header-widget-icon-font-size-${HEADER_SUFFIX}`, updates.fontSize);
+      if (updates.fontWeight) setToken(`--header-widget-icon-font-weight-${HEADER_SUFFIX}`, updates.fontWeight);
+      if (updates.textColor)  setToken(`--header-widget-icon-color-${HEADER_SUFFIX}`, updates.textColor);
+      // (bg not typically applied on the icon itself in this template)
+      break;
+    }
+
+    /** Mobile hamburger button */
+    case "mobileButton": {
+      if (updates.fontSize)       setToken(`--header-mobile-button-font-size-${HEADER_SUFFIX}`, updates.fontSize);
+      if (updates.textColor)      setToken(`--header-mobile-button-color-${HEADER_SUFFIX}`, updates.textColor);
+      if (updates.backgroundColor)setToken(`--header-mobile-button-bg-${HEADER_SUFFIX}`, updates.backgroundColor);
+      if (updates.fontWeight)     setToken(`--header-mobile-button-font-weight-${HEADER_SUFFIX}`, updates.fontWeight);
+      if (updates.textAlign)      setToken(`--header-mobile-button-text-align-${HEADER_SUFFIX}`, updates.textAlign);
+      break;
+    }
+
+    default:
+      break;
+  }
+};
+
+// Token helper (header/global)
+const getHeaderToken = (key: string, index?: number) => {
+  const suffix = index !== undefined ? `global-${index}` : "global-1";
+  return `--header-${key}-${suffix}`;
+};
+
+// Which fields can open the style/content inspector for Header
+const headerAllowedFields = [
+  "section",      // whole header container
+  "logo",         // logo image
+  "menuWrap",     // nav wrapper (alignment)
+  "menuItem",     // top-level menu link styles
+  "dropdown",     // dropdown bg + items
+  "authLink",     // Login / Register
+  "widgetIcon",   // search / heart / bag icons
+  "mobileButton", // hamburger button
+] as const;
+
+// Show inspector when in design mode and a valid header field is targeted
+const showHeaderInspector =
+  isDesignMode &&
+  headerEditingTarget?.componentKey === "header" &&
+  headerAllowedFields.includes(
+    headerEditingTarget.field as (typeof headerAllowedFields)[number]
+  );
+
+
+
+
+
+
 
 
 
