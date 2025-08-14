@@ -114,7 +114,7 @@ const Header: React.FC<HeaderProps> = (props) => {
         cartCount: 2,
       },
 
-    isDesignMode: props.isDesignMode ?? true,
+    isDesignMode: props.isDesignMode ?? false,
   } as const;
 
   console.log('isDesignMode: ', isDesignMode);
@@ -453,6 +453,16 @@ const showHeaderInspector =
     backgroundColor: "transparent",
   };
 
+  const menuListCenterStyle: React.CSSProperties = {
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  width: "100%",
+  gap: "var(--header-menu-gap-global-0, 40px)",
+  margin: 0,
+  paddingLeft: 0,
+};
+
   // Search overlay state (matches original template behavior/classes)
   const [searchOpen, setSearchOpen] = useState(false);
 
@@ -482,135 +492,135 @@ const showHeaderInspector =
 
           {/* Navigation Menu */}
           <div className="col-xl-6 col-lg-7">
-          <nav className="header__menu">
-  <ul>
-    {menu.map((item, idx) => (
-      <li key={`menu-${idx}`} className={item.active ? "active" : undefined}>
-        {isDesignMode &&
-        headerEditingTarget?.componentKey === "header" &&
-        headerEditingTarget.field === "menu" &&
-        headerEditingTarget.index === idx &&
-        headerEditingTarget.subIndex === undefined ? (
-          <textarea
-            ref={(el) => {
-              menuLabelRefs.current[idx] = el;
-              const pos = menuClickPosRefs.current[idx];
-              if (el && typeof pos === "number") {
-                el.selectionStart = el.selectionEnd = pos;
-                menuClickPosRefs.current[idx] = undefined as any;
-              }
-            }}
-            value={item.label}
-            onChange={(e) => {
-              const next = [...menu];
-              next[idx] = { ...next[idx], label: e.target.value };
-              updateHeaderComponentProps("global", "header", { menu: next });
-            }}
-            onClick={(e) => {
-              setClickedInsideInspector();
-              e.stopPropagation();
-            }}
-          />
-        ) : (
-          <a
-            href={item.href}
-            onMouseDown={(e) => {
-              if (!isDesignMode) return;
-              const r = (document as any).caretRangeFromPoint?.(e.clientX, e.clientY);
-              if (r && typeof r.startOffset === "number") {
-                menuClickPosRefs.current[idx] = r.startOffset;
-              }
-            }}
-            onClick={(e) => {
-              if (!isDesignMode) return;
-              e.preventDefault();
-              e.stopPropagation();
-              setHeaderEditingTarget({
-                route: "global",
-                componentKey: "header",
-                field: "menu",
-                index: idx,
-              });
-            }}
-          >
-            {item.label}
-          </a>
-        )}
+          <nav className="header__menu" style={menuWrapStyle}>
+                  <ul>
+                    {menu.map((item, idx) => (
+                      <li key={`menu-${idx}`} className={item.active ? "active" : undefined}>
+                        {isDesignMode &&
+                        headerEditingTarget?.componentKey === "header" &&
+                        headerEditingTarget.field === "menu" &&
+                        headerEditingTarget.index === idx &&
+                        headerEditingTarget.subIndex === undefined ? (
+                          <textarea
+                            ref={(el) => {
+                              menuLabelRefs.current[idx] = el;
+                              const pos = menuClickPosRefs.current[idx];
+                              if (el && typeof pos === "number") {
+                                el.selectionStart = el.selectionEnd = pos;
+                                menuClickPosRefs.current[idx] = undefined as any;
+                              }
+                            }}
+                            value={item.label}
+                            onChange={(e) => {
+                              const next = [...menu];
+                              next[idx] = { ...next[idx], label: e.target.value };
+                              updateHeaderComponentProps("global", "header", { menu: next });
+                            }}
+                            onClick={(e) => {
+                              setClickedInsideInspector();
+                              e.stopPropagation();
+                            }}
+                          />
+                        ) : (
+                          <a
+                            href={item.href}
+                            onMouseDown={(e) => {
+                              if (!isDesignMode) return;
+                              const r = (document as any).caretRangeFromPoint?.(e.clientX, e.clientY);
+                              if (r && typeof r.startOffset === "number") {
+                                menuClickPosRefs.current[idx] = r.startOffset;
+                              }
+                            }}
+                            onClick={(e) => {
+                              if (!isDesignMode) return;
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setHeaderEditingTarget({
+                                route: "global",
+                                componentKey: "header",
+                                field: "menu",
+                                index: idx,
+                              });
+                            }}
+                          >
+                            {item.label}
+                          </a>
+                        )}
 
-        {Array.isArray(item.dropdown) && item.dropdown.length > 0 && (
-          <ul className="dropdown">
-            {item.dropdown.map((dd, j) => (
-              <li key={`menu-${idx}-dd-${j}`}>
-                {isDesignMode &&
-                headerEditingTarget?.componentKey === "header" &&
-                headerEditingTarget.field === "menu" &&
-                headerEditingTarget.index === idx &&
-                headerEditingTarget.subIndex === j ? (
-                  <textarea
-                    ref={(el) => {
-                      if (!menuDropdownLabelRefs.current[idx]) {
-                        menuDropdownLabelRefs.current[idx] = [];
-                      }
-                      menuDropdownLabelRefs.current[idx][j] = el;
-                      const pos = dropdownClickPosRefs.current[idx]?.[j];
-                      if (el && typeof pos === "number") {
-                        el.selectionStart = el.selectionEnd = pos;
-                        if (!dropdownClickPosRefs.current[idx]) {
-                          dropdownClickPosRefs.current[idx] = [];
-                        }
-                        dropdownClickPosRefs.current[idx][j] = undefined as any;
-                      }
-                    }}
-                    value={dd.label}
-                    onChange={(e) => {
-                      const next = [...menu];
-                      const ddArr = (next[idx].dropdown ?? []).slice();
-                      ddArr[j] = { ...ddArr[j], label: e.target.value };
-                      next[idx] = { ...next[idx], dropdown: ddArr };
-                      updateHeaderComponentProps("global", "header", { menu: next });
-                    }}
-                    onClick={(e) => {
-                      setClickedInsideInspector();
-                      e.stopPropagation();
-                    }}
-                  />
-                ) : (
-                  <a
-                    href={dd.href}
-                    onMouseDown={(e) => {
-                      if (!isDesignMode) return;
-                      const r = (document as any).caretRangeFromPoint?.(e.clientX, e.clientY);
-                      if (r && typeof r.startOffset === "number") {
-                        if (!dropdownClickPosRefs.current[idx]) {
-                          dropdownClickPosRefs.current[idx] = [];
-                        }
-                        dropdownClickPosRefs.current[idx][j] = r.startOffset;
-                      }
-                    }}
-                    onClick={(e) => {
-                      if (!isDesignMode) return;
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setHeaderEditingTarget({
-                        route: "global",
-                        componentKey: "header",
-                        field: "menu",
-                        index: idx,
-                        subIndex: j,
-                      });
-                    }}
-                  >
-                    {dd.label}
-                  </a>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </li>
-    ))}
-  </ul>
-</nav>
+                        {Array.isArray(item.dropdown) && item.dropdown.length > 0 && (
+                          <ul className="dropdown">
+                            {item.dropdown.map((dd, j) => (
+                              <li key={`menu-${idx}-dd-${j}`}>
+                                {isDesignMode &&
+                                headerEditingTarget?.componentKey === "header" &&
+                                headerEditingTarget.field === "menu" &&
+                                headerEditingTarget.index === idx &&
+                                headerEditingTarget.subIndex === j ? (
+                                  <textarea
+                                    ref={(el) => {
+                                      if (!menuDropdownLabelRefs.current[idx]) {
+                                        menuDropdownLabelRefs.current[idx] = [];
+                                      }
+                                      menuDropdownLabelRefs.current[idx][j] = el;
+                                      const pos = dropdownClickPosRefs.current[idx]?.[j];
+                                      if (el && typeof pos === "number") {
+                                        el.selectionStart = el.selectionEnd = pos;
+                                        if (!dropdownClickPosRefs.current[idx]) {
+                                          dropdownClickPosRefs.current[idx] = [];
+                                        }
+                                        dropdownClickPosRefs.current[idx][j] = undefined as any;
+                                      }
+                                    }}
+                                    value={dd.label}
+                                    onChange={(e) => {
+                                      const next = [...menu];
+                                      const ddArr = (next[idx].dropdown ?? []).slice();
+                                      ddArr[j] = { ...ddArr[j], label: e.target.value };
+                                      next[idx] = { ...next[idx], dropdown: ddArr };
+                                      updateHeaderComponentProps("global", "header", { menu: next });
+                                    }}
+                                    onClick={(e) => {
+                                      setClickedInsideInspector();
+                                      e.stopPropagation();
+                                    }}
+                                  />
+                                ) : (
+                                  <a
+                                    href={dd.href}
+                                    onMouseDown={(e) => {
+                                      if (!isDesignMode) return;
+                                      const r = (document as any).caretRangeFromPoint?.(e.clientX, e.clientY);
+                                      if (r && typeof r.startOffset === "number") {
+                                        if (!dropdownClickPosRefs.current[idx]) {
+                                          dropdownClickPosRefs.current[idx] = [];
+                                        }
+                                        dropdownClickPosRefs.current[idx][j] = r.startOffset;
+                                      }
+                                    }}
+                                    onClick={(e) => {
+                                      if (!isDesignMode) return;
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      setHeaderEditingTarget({
+                                        route: "global",
+                                        componentKey: "header",
+                                        field: "menu",
+                                        index: idx,
+                                        subIndex: j,
+                                      });
+                                    }}
+                                  >
+                                    {dd.label}
+                                  </a>
+                                )}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </nav>
 
 
           </div>

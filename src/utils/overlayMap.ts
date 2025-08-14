@@ -116,6 +116,7 @@ export const overlayMap = {
               { label: "Blog Details", href: "./blog-details.html" }
             ]
           },
+          { label: "Blog", href: "blog" },
           { label: "Contact", href: "contact" }
         ],
         auth: { loginLabel: "Login", registerLabel: "Register" },
