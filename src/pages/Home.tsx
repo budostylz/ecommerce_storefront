@@ -13,6 +13,10 @@ import Social from '@/components/common/Social';
 //Local components
 import Categories from '@/components/Categories';
 import Product from '@/components/Product';
+import Banner from '@/components/Banner';
+import Trend from '@/components/Trend';
+import Discount from '@/components/Discount';
+import Services from '@/components/Services';
 
 
 const Home = () => {
@@ -27,14 +31,18 @@ const Home = () => {
       {/*<OffcanvasMenu />
       <Breadcrumb />*/}
 
-      <Social />
+
       <Product />
+      <Banner />
+      <Trend />
+      <Discount />
+      <Services />
 
-    
 
 
+      <Social />
       <Footer />
-   </>
+    </>
   );
 };
 
