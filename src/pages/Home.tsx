@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 import toast from "react-hot-toast";
 
+// Zustand store
+import { usePreviewStore } from 'src/store/previewStore';
+
+
 
 // Common layout components
 import Header from '@/components/common/Header';
@@ -20,6 +24,7 @@ import Services from '@/components/Services';
 
 
 const Home = () => {
+  
 
 
 

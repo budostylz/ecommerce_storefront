@@ -23,12 +23,12 @@ const Header: React.FC<HeaderProps> = (props) => {
   // This component’s overlay node
   const headerOverlay = headerOverlayState?.["global"]?.header;
 
-  console.log("headerOverlayState: ", headerOverlayState);
+  /*console.log("headerOverlayState: ", headerOverlayState);
   console.log("headerTokensBag: ", headerTokensBag);
   console.log("updateHeaderDesignToken: ", updateHeaderDesignToken);
   console.log("headerEditingTarget: ", headerEditingTarget);
   console.log("setHeaderEditingTarget: ", setHeaderEditingTarget);
-  console.log("headerOverlay: ", headerOverlay);
+  console.log("headerOverlay: ", headerOverlay);*/
 
   // Click Refs
   const loginClickPosRef = useRef<number | null>(null);
@@ -117,10 +117,10 @@ const Header: React.FC<HeaderProps> = (props) => {
     isDesignMode: props.isDesignMode ?? false,
   } as const;
 
-  console.log('isDesignMode: ', isDesignMode);
+  /*console.log('isDesignMode: ', isDesignMode);
   console.log('logo: ', logo);
   console.log('menu: ', menu);
-  console.log('auth: ', widgets);
+  console.log('auth: ', widgets);*/
 
   // ===== Only apply the tokens that this overlay cares about =====
 const tokensForHeader = useMemo(() => {

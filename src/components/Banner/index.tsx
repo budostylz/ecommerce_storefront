@@ -1,7 +1,42 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useRef, useMemo, useState, useCallback } from "react";
+import { usePreviewStore } from "src/store/previewStore";
+import { overlayMap } from "@/utils/overlayMap";
+import toast from "react-hot-toast";
+import { setClickedInsideInspector } from "src/utils/inspectorClickGuard";
+import { normalizeValue } from "src/utils/normalizeValue";
+import FloatingStyleInspector from "@components/FloatingStyleInspector";
 import useEmblaCarousel from "embla-carousel-react";
 
+
+
+
 const Banner = () => {
+
+  // Zustand state for Footer
+  const homeBannerOverlayState = usePreviewStore((s) => s.overlayMap);
+
+  const updateHomeBannerComponentProps = usePreviewStore((s) => s.updateComponentProps);
+
+  const homeBannerEditingTarget = usePreviewStore((s) => s.editingTarget);
+  const setHomeBannerEditingTarget = usePreviewStore((s) => s.setEditingTarget);
+
+  // This component’s overlay node
+  const homeBannerOverlay = homeBannerOverlayState?.["/"]?.banner;
+
+
+
+  console.log("homeBannerOverlayState: ", homeBannerOverlayState);
+  console.log('updateHomeBannerComponentProps: ', updateHomeBannerComponentProps);
+  console.log("homeBannerEditingTarget: ", homeBannerEditingTarget);
+  console.log("setHomeBannerEditingTarget: ", setHomeBannerEditingTarget);
+  console.log("homebannerOverlay: ", homeBannerOverlay);
+
+
+
+
+
+
+
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "center" });
   const [selectedIndex, setSelectedIndex] = useState(0);
   const slides = [1, 2, 3];
