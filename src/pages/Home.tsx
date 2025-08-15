@@ -25,6 +25,16 @@ import Services from '@/components/Services';
 
 const Home = () => {
   
+    const resetToDefaults = usePreviewStore((state) => state.resetToDefaults);
+
+
+    // 🧪 DEV ONLY: Reset store on mount to preview defaults
+  /*useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      resetToDefaults();
+      console.warn("🧼 Store reset to preview defaults (dev only)");
+    }
+  }, [resetToDefaults]);*/
 
 
 

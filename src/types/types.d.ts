@@ -98,3 +98,19 @@ type HeaderProps = {
   onSearchSubmit?: (query: string) => void;
 };
 
+type BannerSlide = {
+  title: string;
+  subtitle: string;
+  linkText: string;
+};
+
+type BannerProps = {
+  slides?: BannerSlide[];
+  backgroundImage?: string;
+  loop?: boolean;
+  align?: "left" | "center" | "right";
+  autoplayMs?: number;
+  isDesignMode?: boolean;
+};
+
+type Align = BannerProps['align']; // "left" | "center" | "right"
