@@ -607,6 +607,7 @@ const commitQuickLinks = (next: string[]) => {
         paddingTop: "var(--footer-padding-top-global-1, initial)",
         paddingBottom: "var(--footer-padding-bottom-global-1, initial)",
         color: "var(--footer-text-color-global-1, inherit)",
+        marginTop:50
       }}
     >
       <div className="container">

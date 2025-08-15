@@ -12,6 +12,8 @@ import Footer from '../components/common/Footer';
 import Preloader from '../components/common/Preloader';
 import OffcanvasMenu from '../components/common/OffcanvasMenu';
 import Breadcrumb from '../components/common/Breadcrumb';
+import Social from '@/components/common/Social';
+
 
 // Local components
 import ContactSection from '../components/Contact';
@@ -41,7 +43,7 @@ const Contact = () => {
 
     
 
-
+      <Social />
       <Footer />
    </>
   );
